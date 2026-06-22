@@ -1,0 +1,33 @@
+name: ratings_app
+description: "A streamlined way to store, record and view personal ratings for any concept."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  drift: ^2.34.0
+  drift_flutter: ^0.3.0
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  collection: ^1.19.1
+  flutter_riverpod: ^3.3.2
+  path: ^1.9.1
+  path_provider: ^2.1.6
+  shared_preferences: ^2.5.5
+  window_manager: ^0.5.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  drift_dev: ^2.34.0
+  build_runner: ^2.15.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - ratings.db
