@@ -43,9 +43,9 @@ class AppRoot extends ConsumerWidget {
     final path = ref.watch(databasePathProvider);
     if (path == null) {
       return const NoPathStartupScreen();
+    } else {
+      return MainApp();
     }
-
-    return MainApp();
   }
 }
 

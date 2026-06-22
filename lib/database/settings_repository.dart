@@ -13,10 +13,10 @@ class SettingsRepository {
         'databasePath',
       );
 
-  Future<void> setDatabasePath(
+  Future<bool> setDatabasePath(
     String path,
-  ) {
-    return prefs.setString(
+  ) async {
+    return await prefs.setString(
       'databasePath',
       path,
     );

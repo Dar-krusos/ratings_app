@@ -59,7 +59,7 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
             children: [
 
               // fields
-              
+
               TextFormField(
                 controller: titleController,
                 decoration: InputDecoration(

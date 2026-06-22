@@ -30,25 +30,11 @@ final settingsRepositoryProvider =
   ),
 );
 
-final databasePathProvider =
-    Provider<String?>(
-  (ref) {
-    return ref
-        .watch(
-          settingsRepositoryProvider,
-        )
-        .databasePath;
-  },
-);
-
 final databaseProvider =
     Provider<AppDatabase>(
   (ref) {
 
-    final path =
-        ref.watch(
-          databasePathProvider,
-        );
+    final path = ref.watch(databasePathProvider);
 
     return AppDatabase(path!);
   },
@@ -70,6 +56,8 @@ final entriesProvider = StreamProvider<List<Entry>>((ref) {
         );
   },
 );
+
+final databasePathProvider = NotifierProvider<DatabasePathNotifier, String?>(DatabasePathNotifier.new);
 
 final sortProvider = NotifierProvider<SortNotifier, SortState>(SortNotifier.new);
 
