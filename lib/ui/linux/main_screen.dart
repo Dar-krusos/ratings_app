@@ -196,9 +196,12 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                           ),
                         ),
                         IconButton( // settings button
-                          icon: Icon(Icons.settings),
-                          tooltip: 'Settings',
-                          onPressed: () {},
+                          icon: Icon(Icons.file_open),
+                          tooltip: 'Change database path',
+                          onPressed: () => showDialog<String>(
+                            context: context,
+                            builder: (BuildContext context) => SetPathDialog(),
+                          ),
                         ),
                     ],
                   ),

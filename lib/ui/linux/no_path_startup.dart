@@ -140,7 +140,7 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Center(
-                                child: Text('Added new entry.'),
+                                child: Text('Set database path.'),
                               ),
                             ),
                           );

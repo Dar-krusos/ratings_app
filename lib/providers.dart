@@ -36,7 +36,13 @@ final databaseProvider =
 
     final path = ref.watch(databasePathProvider);
 
-    return AppDatabase(path!);
+    final db = AppDatabase(path!);
+
+    ref.onDispose(() {
+      db.close();
+    });
+
+    return db;
   },
 );
 

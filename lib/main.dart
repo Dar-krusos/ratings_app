@@ -60,7 +60,6 @@ class MainApp extends StatelessWidget {
 }
 
 // // linux
-// set path to target db button
 // right click show context menu to delete
 
 // // android
