@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:window_manager/window_manager.dart';
 
 import 'package:ratings_app/providers.dart';
 import 'package:ratings_app/commands/shortcuts.dart';
@@ -14,16 +13,8 @@ void main() async {
 
   final prefs = await SharedPreferences.getInstance();
 
-  // if (prefs.getString('databasePath') == null) {
-  //   await prefs.setString(
-  //     'databasePath',
-  //     '',
-  //   );
-  // }
-
-
   runApp(ProviderScope(
-    overrides: [ sharedPreferencesProvider.overrideWithValue(prefs )],
+    overrides: [ sharedPreferencesProvider.overrideWithValue(prefs)],
     child: MaterialApp(
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -42,39 +33,12 @@ void main() async {
     )));
 }
 
-class AppRoot extends ConsumerStatefulWidget {
+class AppRoot extends ConsumerWidget {
 
   const AppRoot({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() {
-    return AppRootState();
-  }
-}
-
-class AppRootState extends ConsumerState<AppRoot> /* with WindowListener */ {
-
-  @override
-  void initState() {
-    super.initState();
-
-    // windowManager.addListener(this);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    // final prefs = ref.read(sharedPreferencesProvider);
-    // final maximized = prefs.getBool('maximized');
-    // final savedWindowHeight = prefs.getDouble('windowHeight');
-    // final savedWindowWidth = prefs.getDouble('windowWidth');
-
-    // if (maximized != null && maximized) {
-    //   windowManager.maximize();
-    // }
-    // else if (savedWindowWidth != null && savedWindowHeight != null) {
-    //   windowManager.setSize(Size(savedWindowWidth, savedWindowHeight));
-    // }
+  Widget build(BuildContext context, WidgetRef ref) {
 
     final path = ref.watch(databasePathProvider);
     if (path == null) {
@@ -83,22 +47,6 @@ class AppRootState extends ConsumerState<AppRoot> /* with WindowListener */ {
 
     return MainApp();
   }
-
-  // @override
-  // Future<void> onWindowClose() async {
-
-  //   final prefs = ref.read(sharedPreferencesProvider);
-
-  //   final maximized = await windowManager.isMaximized();
-  //   debugPrint(maximized.toString());
-  //   await prefs.setBool('maximized', maximized);
-
-  //   if (!maximized) {
-  //     final size = await windowManager.getSize();
-  //     await prefs.setDouble('windowHeight', size.height);
-  //     await prefs.setDouble('windowWidth', size.width);
-  //   }
-  // }
 }
 
 class MainApp extends StatelessWidget {
