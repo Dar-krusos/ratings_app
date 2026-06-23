@@ -1,4 +1,3 @@
-// import 'package:flutter/material.dart';
 import 'package:drift/drift.dart';
 
 import 'package:ratings_app/database/database.dart';
@@ -124,10 +123,16 @@ class EntryRepository {
 
     ));
   }
-  
+
   Future updateEntry(int id, EntriesCompanion edit) {
     return (db.update(db.entries)..where(
       (e) => e.id.equals(id)
     )).write(edit);
+  }
+
+  Future deleteEntry(int id) {
+    return (db.delete(db.entries)..where(
+      (e) => e.id.equals(id)
+    )).go();
   }
 }

@@ -59,9 +59,6 @@ class MainApp extends StatelessWidget {
   }
 }
 
-// // linux
-// right click show context menu to delete
-
 // // android
 // top bar: https://docs.flutter.dev/cookbook/lists/floating-app-bar
 // top bar elements: tab bar (left) + buttons (right) [search, add, overflow (set path, undo, redo)]

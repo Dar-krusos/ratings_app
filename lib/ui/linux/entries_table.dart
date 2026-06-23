@@ -6,6 +6,7 @@ import 'package:ratings_app/database/database.dart';
 import 'package:ratings_app/providers.dart';
 import 'package:ratings_app/ui/linux/columns.dart';
 import 'package:ratings_app/commands/command.dart';
+import 'package:ratings_app/ui/linux/context_menu.dart';
 
 class EntriesTable extends ConsumerStatefulWidget {
 
@@ -88,7 +89,9 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
                     (context, index) {
                   final entry = rows[index];
 
-                  return Row(
+                  return ContextMenu(
+                    id: entry.id,
+                    child: Row(
                       children: [
                         Builder(
                           builder: (context) {
@@ -269,6 +272,7 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
                           }
                         ),
                       ],
+                    )
                   );
                 },
               ),
