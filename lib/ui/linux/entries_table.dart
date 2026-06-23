@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/src/core.dart';
 
 import 'package:ratings_app/database/database.dart';
 import 'package:ratings_app/providers.dart';
@@ -40,7 +41,6 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
   Widget build(BuildContext context) {
     final entries = ref.watch(entriesProvider);
     final editingCell = ref.watch(cellEditingProvider);
-    final commandManager = ref.watch(commandManagerProvider.notifier);
 
     if (MediaQuery.platformBrightnessOf(context) == Brightness.light) {
       defaultTextColor = Colors.black;
@@ -80,7 +80,7 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
             const Divider(height: 1,),
 
             // table
-            
+
             Expanded(
               child: ListView.builder(
                 itemCount: rows.length,
@@ -125,8 +125,6 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
                                   initialValue: entry.title,
                                   cellStyle: Theme.of(context).textTheme.bodyMedium,
                                   textColor: textColor,
-                                  ref: ref,
-                                  commandManager: commandManager,
                                 )
                               )
                             );
@@ -139,7 +137,7 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
                               child: CustomText(
                                 entryId: entry.id,
                                 column: ColumnType.title,
-                                ref: ref,
+                                // ref: ref,
                                 entryValue: entry.title,
                                 textColor: textColor,
                                 textLeftPadding: 5,
@@ -165,8 +163,6 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
                                   cellStyle: Theme.of(context).textTheme.bodyMedium,
                                   textAlign: TextAlign.center,
                                   textColor: defaultTextColor,
-                                  ref: ref,
-                                  commandManager: commandManager,
                                 )
                               )
                             );
@@ -177,7 +173,7 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
                             child: CustomText(
                               entryId: entry.id,
                               column: ColumnType.rating,
-                              ref: ref,
+                              // ref: ref,
                               entryValue: entry.rating.toString(),
                               alignment: Alignment.center,
                               textColor: defaultTextColor,
@@ -202,8 +198,6 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
                                   cellStyle: Theme.of(context).textTheme.bodyMedium,
                                   textAlign: TextAlign.center,
                                   textColor: defaultTextColor,
-                                  ref: ref,
-                                  commandManager: commandManager,
                                 )
                               )
                             );
@@ -214,7 +208,7 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
                             child: CustomText(
                               entryId: entry.id,
                               column: ColumnType.dateCompleted,
-                              ref: ref,
+                              // ref: ref,
                               entryValue: entry.dateCompleted!,
                               alignment: Alignment.center,
                               textColor: defaultTextColor,
@@ -241,8 +235,6 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
                                     initialValue: entry.notes!,
                                     cellStyle: Theme.of(context).textTheme.bodyMedium,
                                     textColor: defaultTextColor,
-                                    ref: ref,
-                                    commandManager: commandManager,
                                   )
                                 )
                               )
@@ -259,7 +251,7 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
                                 child: CustomText(
                                   entryId: entry.id,
                                   column: ColumnType.notes,
-                                  ref: ref,
+                                  // ref: ref,
                                   entryValue: entry.notes!,
                                   textColor: defaultTextColor,
                                   textLeftPadding: 5,
@@ -281,7 +273,7 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
   }
 }
 
-class CustomFormField extends StatelessWidget {
+class CustomFormField extends ConsumerStatefulWidget {
 
   final int entryId;
   final ColumnType column;
@@ -289,8 +281,6 @@ class CustomFormField extends StatelessWidget {
   final TextStyle? cellStyle;
   final TextAlign? textAlign;
   final Color? textColor;
-  final WidgetRef ref;
-  final CommandManager commandManager;
 
   const CustomFormField({
     super.key,
@@ -300,35 +290,58 @@ class CustomFormField extends StatelessWidget {
     this.cellStyle,
     this.textAlign,
     this.textColor,
-    required this.ref,
-    required this.commandManager,
   });
+
+  @override
+  ConsumerState<CustomFormField> createState() => _CustomFormFieldState();
+}
+
+class _CustomFormFieldState extends ConsumerState<CustomFormField> {
+
+  final focusNode = FocusNode();
+  late final CommandManager commandManager;
+
+  @override
+  void initState() {
+    super.initState();
+
+    focusNode.requestFocus();
+    commandManager = ref.watch(commandManagerProvider.notifier);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    focusNode.dispose();
+  }
 
   @override
   Widget build(context) {
     return TextFormField(
-      key: ValueKey(initialValue),
-      initialValue: initialValue,
+      key: ValueKey(widget.initialValue),
       autofocus: true,
+      focusNode: focusNode,
+      initialValue: widget.initialValue,
       decoration: InputDecoration(
         border: InputBorder.none,
         isDense: true,
       ),
       maxLines: 1,
       style: TextStyle(
-        color: textColor ?? Colors.black,
-        fontSize: cellStyle?.fontSize,
-        letterSpacing: cellStyle?.letterSpacing,
-        height: cellStyle?.height,
+        color: widget.textColor ?? Colors.black,
+        fontSize: widget.cellStyle?.fontSize,
+        letterSpacing: widget.cellStyle?.letterSpacing,
+        height: widget.cellStyle?.height,
         overflow: TextOverflow.ellipsis,
       ),
-      textAlign: textAlign ?? TextAlign.left,
+      textAlign: widget.textAlign ?? TextAlign.left,
       onFieldSubmitted: (value) {
         commandManager.execute(EditEntryFieldCommand(
           setter: ref.read(entryRepositoryProvider).updateEntry,
-          id: entryId,
-          oldValue: companionCreator(column, initialValue),
-          newValue: companionCreator(column, value),
+          id: widget.entryId,
+          oldValue: companionCreator(widget.column, widget.initialValue),
+          newValue: companionCreator(widget.column, value),
         ));
         ref.read(rootFocusNodeProvider).requestFocus();
         commandManager.refresh();
@@ -353,11 +366,10 @@ class CustomFormField extends StatelessWidget {
   }
 }
 
-class CustomText extends StatelessWidget {
+class CustomText extends ConsumerStatefulWidget {
 
   final int entryId;
   final ColumnType column;
-  final WidgetRef ref;
   final String entryValue;
   final Alignment? alignment;
   final Color? textColor;
@@ -368,7 +380,6 @@ class CustomText extends StatelessWidget {
     super.key,
     required this.entryId,
     required this.column,
-    required this.ref,
     required this.entryValue,
     this.alignment,
     this.textColor,
@@ -377,29 +388,43 @@ class CustomText extends StatelessWidget {
   });
 
   @override
+  ConsumerState<CustomText> createState() => _CustomTextState();
+}
+
+class _CustomTextState extends ConsumerState<CustomText> {
+
+  bool hovered = false;
+
+  @override
   Widget build(context) {
     return ContextMenu(
-      id: entryId,
+      id: widget.entryId,
       child: FocusableActionDetector(
-        child: InkWell(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          splashFactory: NoSplash.splashFactory,
+        onShowHoverHighlight: (isHovered) {
+          setState(() {
+            hovered = isHovered;
+          });
+        },
+        child: GestureDetector(
           onTap: () {
             ref
               .read(cellEditingProvider.notifier)
-              .setCell(entryId, column);
+              .setCell(widget.entryId, widget.column);
           },
-          child: SizedBox(
-            height: 40,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              color: hovered ? Colors.grey.shade200 : Colors.transparent,
+            ),
             child: Padding(
-              padding: EdgeInsetsGeometry.directional(start: textLeftPadding ?? 0),
+              padding: EdgeInsetsGeometry.directional(start: widget.textLeftPadding ?? 0),
               child: Align(
-                alignment: alignment ?? Alignment.centerLeft,
+                alignment: widget.alignment ?? Alignment.centerLeft,
                 child: Text(
-                  entryValue,
-                  key: ValueKey(entryValue),
+                  widget.entryValue,
+                  key: ValueKey(widget.entryValue),
                   style: TextStyle(
-                    color: textColor ?? Colors.black,
+                    color: widget.textColor ?? Colors.black,
                   )
                 )
               )
