@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 
 import 'package:ratings_app/providers.dart';
 
@@ -310,8 +310,10 @@ class SetPathDialogState extends ConsumerState<SetPathDialog> {
                   ),
                   IconButton(
                     icon: Icon(Icons.file_open),
+                    hoverColor: Colors.transparent,
+                    tooltip: 'Select the database save location',
                     onPressed: () async {
-                      final directory = await FilePickerLinux().getDirectoryPath();
+                      final directory = await getDirectoryPath();
                       if (directory != null) {
                         directoryController.text = directory;
                       }
@@ -348,15 +350,20 @@ class SetPathDialogState extends ConsumerState<SetPathDialog> {
                   ),
                   IconButton(
                     icon: Icon(Icons.file_open),
+                    hoverColor: Colors.transparent,
+                    tooltip: 'Select an existing file',
                     onPressed: () async {
-                      final file = await FilePickerLinux().pickFiles(
-                        type: FileType.custom,
-                        allowedExtensions: <String>[ 'db', 'sqlite' ]
+                      final file = await openFile(
+                        acceptedTypeGroups: [
+                          XTypeGroup(
+                            label: 'Database files',
+                            extensions: ['db', 'sqlite'],
+                          )
+                        ]
                       );
 
                       if (file != null) {
-                        final fileName = file.names[0];
-                        fileController.text = fileName!;
+                        fileController.text = file.name;
                       }
                     }
                   )
