@@ -41,7 +41,6 @@ class _EntriesListState extends ConsumerState<EntriesList> {
   @override
   Widget build(BuildContext context) {
     final entries = ref.watch(entriesProvider);
-    final editingCell = ref.watch(cellEditingProvider);
 
     if (MediaQuery.platformBrightnessOf(context) == Brightness.light) {
       defaultTextColor = Colors.black;
@@ -53,221 +52,210 @@ class _EntriesListState extends ConsumerState<EntriesList> {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stackTrace) => Center(child: Text(error.toString())),
       data: (rows) {
-        return Column(
-          children: [
-            SizedBox(
-              height: 48,
-              child: Row(
-                children: [
+        return Expanded(
+          child: ListView.builder(
+            itemCount: rows.length,
+            itemExtent: 60,
+            itemBuilder:
+                (context, index) {
+              final entry = rows[index];
 
-                  // headers
-
-                  for (final column in columns)
-                    Expanded(
-                      flex: column.flex,
-                      child: SortableHeader(
-                        text: column.title,
-                        onPressed: () {
-                          ref
-                            .read(sortProvider.notifier)
-                            .setSort(column.sortType);
-                        },
-                      ),
+              return Card(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: ListTile(
+                    leading: SizedBox(
+                      width: 60,
+                      child: Text(
+                        entry.rating.toString(),
+                        style: TextStyle(
+                          fontSize: Theme.of(context).textTheme.headlineMedium?.fontSize,
+                        ),
+                        textAlign: TextAlign.center,
+                      )
                     ),
-                ],
-              )
-            ),
+                    title: Text(entry.title),
+                  )
+                )
+              );
+            }
 
-            const Divider(height: 1,),
+            //   return Row(
+            //     children: [
+            //       Builder(
+            //         builder: (context) {
+            //           final flex = 4;
+            //           Color textColor;
 
-            // table
-
-            Expanded(
-              child: ListView.builder(
-                itemCount: rows.length,
-                itemExtent: 40,
-                itemBuilder:
-                    (context, index) {
-                  final entry = rows[index];
-
-                  return Row(
-                    children: [
-                      Builder(
-                        builder: (context) {
-                          final flex = 4;
-                          Color textColor;
-
-                          if (MediaQuery.platformBrightnessOf(context) == Brightness.light) {
-                            if (entry.mediaType == 'Movie') {
-                              textColor = lightMovieColor;
-                            } else if (entry.mediaType == 'Series') {
-                              textColor = lightSeriesColor;
-                            } else {
-                              textColor = defaultTextColor;
-                            }
-                          } else {
-                            if (entry.mediaType == 'Movie') {
-                              textColor = darkMovieColor;
-                            } else if (entry.mediaType == 'Series') {
-                              textColor = darkSeriesColor;
-                            } else {
-                              textColor = defaultTextColor;
-                            }
-                          }
-                          
-                          if (editingCell == (entry.id, ColumnType.title)) {
-                            return Expanded(
-                              flex: flex,
-                              child: Padding(
-                                padding: EdgeInsetsGeometry.directional(start: 13),
-                                child: CustomFormField(
-                                  entryId: entry.id,
-                                  column: ColumnType.title,
-                                  initialValue: entry.title,
-                                  cellStyle: Theme.of(context).textTheme.bodyMedium,
-                                  textColor: textColor,
-                                )
-                              )
-                            );
-                          }
-
-                          return Expanded(
-                            flex: flex,
-                            child: Padding(
-                              padding: EdgeInsetsGeometry.directional(start: 8),
-                              child: CustomText(
-                                entryId: entry.id,
-                                column: ColumnType.title,
-                                // ref: ref,
-                                entryValue: entry.title,
-                                textColor: textColor,
-                                textLeftPadding: 5,
-                              )
-                            )
-                          );
-                        }
-                      ),
+            //           if (MediaQuery.platformBrightnessOf(context) == Brightness.light) {
+            //             if (entry.mediaType == 'Movie') {
+            //               textColor = lightMovieColor;
+            //             } else if (entry.mediaType == 'Series') {
+            //               textColor = lightSeriesColor;
+            //             } else {
+            //               textColor = defaultTextColor;
+            //             }
+            //           } else {
+            //             if (entry.mediaType == 'Movie') {
+            //               textColor = darkMovieColor;
+            //             } else if (entry.mediaType == 'Series') {
+            //               textColor = darkSeriesColor;
+            //             } else {
+            //               textColor = defaultTextColor;
+            //             }
+            //           }
                       
-                      Builder(
-                        builder: (context) {
-                          final flex = 1;
-                          
-                          if (editingCell == (entry.id, ColumnType.rating)) {
-                            return Expanded(
-                              flex: flex,
-                              child: Padding(
-                                padding: EdgeInsetsGeometry.directional(start: 4),
-                                child: CustomFormField(
-                                  entryId: entry.id,
-                                  column: ColumnType.rating,
-                                  initialValue: entry.rating.toString(),
-                                  cellStyle: Theme.of(context).textTheme.bodyMedium,
-                                  textAlign: TextAlign.center,
-                                  textColor: defaultTextColor,
-                                )
-                              )
-                            );
-                          }
+            //           if (editingCell == (entry.id, ColumnType.title)) {
+            //             return Expanded(
+            //               flex: flex,
+            //               child: Padding(
+            //                 padding: EdgeInsetsGeometry.directional(start: 13),
+            //                 child: CustomFormField(
+            //                   entryId: entry.id,
+            //                   column: ColumnType.title,
+            //                   initialValue: entry.title,
+            //                   cellStyle: Theme.of(context).textTheme.bodyMedium,
+            //                   textColor: textColor,
+            //                 )
+            //               )
+            //             );
+            //           }
 
-                          return Expanded(
-                            flex: flex,
-                            child: CustomText(
-                              entryId: entry.id,
-                              column: ColumnType.rating,
-                              // ref: ref,
-                              entryValue: entry.rating.toString(),
-                              alignment: Alignment.center,
-                              textColor: defaultTextColor,
-                            )
-                          );
-                        }
-                      ),
+            //           return Expanded(
+            //             flex: flex,
+            //             child: Padding(
+            //               padding: EdgeInsetsGeometry.directional(start: 8),
+            //               child: CustomText(
+            //                 entryId: entry.id,
+            //                 column: ColumnType.title,
+            //                 // ref: ref,
+            //                 entryValue: entry.title,
+            //                 textColor: textColor,
+            //                 textLeftPadding: 5,
+            //               )
+            //             )
+            //           );
+            //         }
+            //       ),
+                  
+            //       Builder(
+            //         builder: (context) {
+            //           final flex = 1;
+                      
+            //           if (editingCell == (entry.id, ColumnType.rating)) {
+            //             return Expanded(
+            //               flex: flex,
+            //               child: Padding(
+            //                 padding: EdgeInsetsGeometry.directional(start: 4),
+            //                 child: CustomFormField(
+            //                   entryId: entry.id,
+            //                   column: ColumnType.rating,
+            //                   initialValue: entry.rating.toString(),
+            //                   cellStyle: Theme.of(context).textTheme.bodyMedium,
+            //                   textAlign: TextAlign.center,
+            //                   textColor: defaultTextColor,
+            //                 )
+            //               )
+            //             );
+            //           }
 
-                      Builder(
-                        builder: (context) {
-                          final flex = 2;
-                          
-                          if (editingCell == (entry.id, ColumnType.dateCompleted)) {
-                            return Expanded(
-                              flex: flex,
-                              child: Padding(
-                                padding: EdgeInsetsGeometry.directional(start: 4),
-                                child: CustomFormField(
-                                  entryId: entry.id,
-                                  column: ColumnType.dateCompleted,
-                                  initialValue: entry.dateCompleted!,
-                                  cellStyle: Theme.of(context).textTheme.bodyMedium,
-                                  textAlign: TextAlign.center,
-                                  textColor: defaultTextColor,
-                                )
-                              )
-                            );
-                          }
+            //           return Expanded(
+            //             flex: flex,
+            //             child: CustomText(
+            //               entryId: entry.id,
+            //               column: ColumnType.rating,
+            //               // ref: ref,
+            //               entryValue: entry.rating.toString(),
+            //               alignment: Alignment.center,
+            //               textColor: defaultTextColor,
+            //             )
+            //           );
+            //         }
+            //       ),
 
-                          return Expanded(
-                            flex: flex,
-                            child: CustomText(
-                              entryId: entry.id,
-                              column: ColumnType.dateCompleted,
-                              // ref: ref,
-                              entryValue: entry.dateCompleted!,
-                              alignment: Alignment.center,
-                              textColor: defaultTextColor,
-                            )
-                          );
-                        }
-                      ),
+            //       Builder(
+            //         builder: (context) {
+            //           final flex = 2;
+                      
+            //           if (editingCell == (entry.id, ColumnType.dateCompleted)) {
+            //             return Expanded(
+            //               flex: flex,
+            //               child: Padding(
+            //                 padding: EdgeInsetsGeometry.directional(start: 4),
+            //                 child: CustomFormField(
+            //                   entryId: entry.id,
+            //                   column: ColumnType.dateCompleted,
+            //                   initialValue: entry.dateCompleted!,
+            //                   cellStyle: Theme.of(context).textTheme.bodyMedium,
+            //                   textAlign: TextAlign.center,
+            //                   textColor: defaultTextColor,
+            //                 )
+            //               )
+            //             );
+            //           }
 
-                      Builder(
-                        builder: (context) {
-                          final flex = 4;
-                          
-                          if (editingCell == (entry.id, ColumnType.notes)) {
-                            return Expanded(
-                              flex: flex,
-                              child: Padding(
-                                padding: EdgeInsetsGeometry.directional(start: 5, end: 15),
-                                child: Tooltip(
-                                  constraints: BoxConstraints(maxWidth: 400),
-                                  message: entry.notes,
-                                  child: CustomFormField(
-                                    entryId: entry.id,
-                                    column: ColumnType.notes,
-                                    initialValue: entry.notes!,
-                                    cellStyle: Theme.of(context).textTheme.bodyMedium,
-                                    textColor: defaultTextColor,
-                                  )
-                                )
-                              )
-                            );
-                          }
+            //           return Expanded(
+            //             flex: flex,
+            //             child: CustomText(
+            //               entryId: entry.id,
+            //               column: ColumnType.dateCompleted,
+            //               // ref: ref,
+            //               entryValue: entry.dateCompleted!,
+            //               alignment: Alignment.center,
+            //               textColor: defaultTextColor,
+            //             )
+            //           );
+            //         }
+            //       ),
 
-                          return Expanded(
-                            flex: flex,
-                            child: Padding(
-                              padding: EdgeInsetsGeometry.directional(end: 15),
-                              child: Tooltip(
-                                constraints: BoxConstraints(maxWidth: 400),
-                                message: entry.notes,
-                                child: CustomText(
-                                  entryId: entry.id,
-                                  column: ColumnType.notes,
-                                  // ref: ref,
-                                  entryValue: entry.notes!,
-                                  textColor: defaultTextColor,
-                                  textLeftPadding: 5,
-                                )
-                              )
-                            )
-                          );
-                        }
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ],
+            //       Builder(
+            //         builder: (context) {
+            //           final flex = 4;
+                      
+            //           if (editingCell == (entry.id, ColumnType.notes)) {
+            //             return Expanded(
+            //               flex: flex,
+            //               child: Padding(
+            //                 padding: EdgeInsetsGeometry.directional(start: 5, end: 15),
+            //                 child: Tooltip(
+            //                   constraints: BoxConstraints(maxWidth: 400),
+            //                   message: entry.notes,
+            //                   child: CustomFormField(
+            //                     entryId: entry.id,
+            //                     column: ColumnType.notes,
+            //                     initialValue: entry.notes!,
+            //                     cellStyle: Theme.of(context).textTheme.bodyMedium,
+            //                     textColor: defaultTextColor,
+            //                   )
+            //                 )
+            //               )
+            //             );
+            //           }
+
+            //           return Expanded(
+            //             flex: flex,
+            //             child: Padding(
+            //               padding: EdgeInsetsGeometry.directional(end: 15),
+            //               child: Tooltip(
+            //                 constraints: BoxConstraints(maxWidth: 400),
+            //                 message: entry.notes,
+            //                 child: CustomText(
+            //                   entryId: entry.id,
+            //                   column: ColumnType.notes,
+            //                   // ref: ref,
+            //                   entryValue: entry.notes!,
+            //                   textColor: defaultTextColor,
+            //                   textLeftPadding: 5,
+            //                 )
+            //               )
+            //             )
+            //           );
+            //         }
+            //       ),
+            //     ],
+            //   );
+            // },
+          ),
         );
       },
     );

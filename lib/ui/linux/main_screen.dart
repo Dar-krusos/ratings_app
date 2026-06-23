@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ratings_app/ui/data_types.dart';
 import 'package:ratings_app/providers.dart';
-import 'package:ratings_app/ui/linux/providers.dart';
 import 'package:ratings_app/sort.dart';
 
 import 'package:ratings_app/ui/linux/entries_table.dart';

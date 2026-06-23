@@ -110,135 +110,137 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           length: 3,
           child: Scaffold(
             appBar: AppBar(
-              title: Text('Ratings'),
+              title: Row(
+                children: [
+
+                  // tabs
+
+                  Expanded(
+                    child: TabBar(
+                      tabs: [
+                        for (final tab in tabs)
+                          Tab(
+                            icon: Icon(tab.icon),
+                            text: tab.title,
+                          ),
+                      ],
+                      onTap: (index) {
+                        Future.delayed(
+                          const Duration(milliseconds: 150),
+                          () {
+                            ref.read(tabProvider.notifier)
+                                .select(FilterType.values[index]);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+
+                  // search bar and buttons
+
+                  Padding(
+                    padding: const EdgeInsetsGeometry.directional(end: 5),
+                    child: Row(
+                      children: [
+
+                          // search bar
+                          
+                          // Expanded(
+                          //   child: Padding(
+                          //       padding: const EdgeInsetsGeometry.directional(end: 10),
+                          //       child: SearchBar(
+                          //         constraints: const BoxConstraints(minHeight: 30),
+                          //         controller: searchController,
+                          //         focusNode: searchFocusNode,
+                          //         elevation: WidgetStatePropertyAll(0),
+                          //         leading: Icon(Icons.search),
+                          //         hintText: "Search",
+                          //         onChanged: (value) {
+                          //           ref.read(searchProvider.notifier).update(value);
+                          //         },
+                          //         onTapOutside: (_) {
+                          //           rootFocusNode.requestFocus();
+                          //         }
+                          //       )
+                          //   )
+                          // ),
+
+                          // buttons
+
+                          IconButton( // search button
+                            icon: Icon(Icons.search),
+                            tooltip: 'Search',
+                            visualDensity: VisualDensity.compact,
+                            onPressed: () {
+                              setState(() {
+                                searching = true;
+                              });
+                            },
+                          ),
+
+                          // IconButton( // undo button
+                          //   icon: Icon(
+                          //     Icons.undo_rounded,
+                          //     color: commandManagerCheck.canUndo ? enabledColor : disabledColor,
+                          //   ),
+                          //   tooltip: 'Undo last change',
+                          //   onPressed: () {
+                          //     commandManager.undo();
+                          //   },
+                          // ),
+                          // IconButton( // redo button
+                          //   icon: Icon(
+                          //     Icons.redo_rounded,
+                          //     color: commandManagerCheck.canRedo ? enabledColor : disabledColor,
+                          //     ),
+                          //   tooltip: 'Redo last change',
+                          //   onPressed: () {
+                          //     commandManager.redo();
+                          //   },
+                          // ),
+                          IconButton( // add entry button
+                            icon: Icon(Icons.add),
+                            padding: const EdgeInsetsGeometry.symmetric(horizontal: 0),
+                            tooltip: 'Add new entry',
+                            visualDensity: VisualDensity.compact,
+                            onPressed: () => showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) => AddEntryDialog(),
+                            ),
+                          ),
+                          MultiSortButton(
+                            ref: ref,
+                            icon: Icon(Icons.sort),
+                            tooltip: 'Sort by media type, then by rating',
+                            visualDensity: VisualDensity.compact,
+                            onPressed: () {
+                              ref
+                                .read(sortProvider.notifier)
+                                .setSort(SortType.typeThenRating);
+                            },
+                          ),
+                          IconButton( // menu button
+                            icon: Icon(Icons.menu),
+                            tooltip: 'Open overflow menu',
+                            visualDensity: VisualDensity.compact,
+                            onPressed: () {},
+                            // onPressed: () => showDialog<String>(
+                            //   context: context,
+                            //   builder: (BuildContext context) => OverflowMenu(),
+                            // ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
             body: Column(
               children: [
 
                 // first row
 
-                Row(
-                  children: [
-
-                    // tabs
-
-                    Expanded(
-                      child: TabBar(
-                        tabs: [
-                          for (final tab in tabs)
-                            Tab(
-                              icon: Icon(tab.icon),
-                              text: tab.title,
-                            ),
-                        ],
-                        onTap: (index) {
-                          Future.delayed(
-                            const Duration(milliseconds: 150),
-                            () {
-                              ref.read(tabProvider.notifier)
-                                  .select(FilterType.values[index]);
-                            },
-                          );
-                        },
-                      ),
-                    ),
-
-                    // search bar and buttons
-
-                    Padding(
-                      padding: const EdgeInsetsGeometry.directional(end: 5),
-                      child: Row(
-                        spacing: -15,
-                        children: [
-
-                            // search bar
-                            
-                            // Expanded(
-                            //   child: Padding(
-                            //       padding: const EdgeInsetsGeometry.directional(end: 10),
-                            //       child: SearchBar(
-                            //         constraints: const BoxConstraints(minHeight: 30),
-                            //         controller: searchController,
-                            //         focusNode: searchFocusNode,
-                            //         elevation: WidgetStatePropertyAll(0),
-                            //         leading: Icon(Icons.search),
-                            //         hintText: "Search",
-                            //         onChanged: (value) {
-                            //           ref.read(searchProvider.notifier).update(value);
-                            //         },
-                            //         onTapOutside: (_) {
-                            //           rootFocusNode.requestFocus();
-                            //         }
-                            //       )
-                            //   )
-                            // ),
-
-                            // buttons
-
-                            IconButton( // search button
-                              icon: Icon(Icons.search),
-                              tooltip: 'Search',
-                              onPressed: () {
-                                setState(() {
-                                  searching = true;
-                                });
-                              },
-                            ),
-
-                            // IconButton( // undo button
-                            //   icon: Icon(
-                            //     Icons.undo_rounded,
-                            //     color: commandManagerCheck.canUndo ? enabledColor : disabledColor,
-                            //   ),
-                            //   tooltip: 'Undo last change',
-                            //   onPressed: () {
-                            //     commandManager.undo();
-                            //   },
-                            // ),
-                            // IconButton( // redo button
-                            //   icon: Icon(
-                            //     Icons.redo_rounded,
-                            //     color: commandManagerCheck.canRedo ? enabledColor : disabledColor,
-                            //     ),
-                            //   tooltip: 'Redo last change',
-                            //   onPressed: () {
-                            //     commandManager.redo();
-                            //   },
-                            // ),
-                            IconButton( // add entry button
-                              icon: Icon(Icons.add),
-                              padding: const EdgeInsetsGeometry.symmetric(horizontal: 0),
-                              tooltip: 'Add new entry',
-                              onPressed: () => showDialog<String>(
-                                context: context,
-                                builder: (BuildContext context) => AddEntryDialog(),
-                              ),
-                            ),
-                            MultiSortButton(
-                              ref: ref,
-                              icon: Icon(Icons.sort),
-                              tooltip: 'Sort by media type, then by rating',
-                              onPressed: () {
-                                ref
-                                  .read(sortProvider.notifier)
-                                  .setSort(SortType.typeThenRating);
-                              },
-                            ),
-                            IconButton( // menu button
-                              icon: Icon(Icons.menu),
-                              padding: const EdgeInsetsGeometry.symmetric(horizontal: 0),
-                              tooltip: 'Open overflow menu',
-                              onPressed: () {},
-                              // onPressed: () => showDialog<String>(
-                              //   context: context,
-                              //   builder: (BuildContext context) => OverflowMenu(),
-                              // ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                
 
                 // list of entries
 
@@ -262,6 +264,7 @@ class MultiSortButton extends IconButton {
     required this.ref,
     required super.icon,
     super.tooltip,
+    super.visualDensity,
     required super.onPressed,
   });
 
@@ -276,6 +279,7 @@ class MultiSortButton extends IconButton {
     return IconButton(
       icon: super.icon,
       tooltip: super.tooltip,
+      visualDensity: super.visualDensity,
       onPressed: super.onPressed,
     );
   }
