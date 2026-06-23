@@ -89,190 +89,187 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
                     (context, index) {
                   final entry = rows[index];
 
-                  return ContextMenu(
-                    id: entry.id,
-                    child: Row(
-                      children: [
-                        Builder(
-                          builder: (context) {
-                            final flex = 4;
-                            Color textColor;
+                  return Row(
+                    children: [
+                      Builder(
+                        builder: (context) {
+                          final flex = 4;
+                          Color textColor;
 
-                            if (MediaQuery.platformBrightnessOf(context) == Brightness.light) {
-                              if (entry.mediaType == 'Movie') {
-                                textColor = lightMovieColor;
-                              } else if (entry.mediaType == 'Series') {
-                                textColor = lightSeriesColor;
-                              } else {
-                                textColor = defaultTextColor;
-                              }
+                          if (MediaQuery.platformBrightnessOf(context) == Brightness.light) {
+                            if (entry.mediaType == 'Movie') {
+                              textColor = lightMovieColor;
+                            } else if (entry.mediaType == 'Series') {
+                              textColor = lightSeriesColor;
                             } else {
-                              if (entry.mediaType == 'Movie') {
-                                textColor = darkMovieColor;
-                              } else if (entry.mediaType == 'Series') {
-                                textColor = darkSeriesColor;
-                              } else {
-                                textColor = defaultTextColor;
-                              }
+                              textColor = defaultTextColor;
                             }
-                            
-                            if (editingCell == (entry.id, ColumnType.title)) {
-                              return Expanded(
-                                flex: flex,
-                                child: Padding(
-                                  padding: EdgeInsetsGeometry.directional(start: 13),
-                                  child: CustomFormField(
-                                    entryId: entry.id,
-                                    column: ColumnType.title,
-                                    initialValue: entry.title,
-                                    cellStyle: Theme.of(context).textTheme.bodyMedium,
-                                    textColor: textColor,
-                                    ref: ref,
-                                    commandManager: commandManager,
-                                  )
-                                )
-                              );
+                          } else {
+                            if (entry.mediaType == 'Movie') {
+                              textColor = darkMovieColor;
+                            } else if (entry.mediaType == 'Series') {
+                              textColor = darkSeriesColor;
+                            } else {
+                              textColor = defaultTextColor;
                             }
-
+                          }
+                          
+                          if (editingCell == (entry.id, ColumnType.title)) {
                             return Expanded(
                               flex: flex,
                               child: Padding(
-                                padding: EdgeInsetsGeometry.directional(start: 8),
-                                child: CustomText(
+                                padding: EdgeInsetsGeometry.directional(start: 13),
+                                child: CustomFormField(
                                   entryId: entry.id,
                                   column: ColumnType.title,
-                                  ref: ref,
-                                  entryValue: entry.title,
+                                  initialValue: entry.title,
+                                  cellStyle: Theme.of(context).textTheme.bodyMedium,
                                   textColor: textColor,
-                                  textLeftPadding: 5,
+                                  ref: ref,
+                                  commandManager: commandManager,
                                 )
                               )
                             );
                           }
-                        ),
-                        
-                        Builder(
-                          builder: (context) {
-                            final flex = 1;
-                            
-                            if (editingCell == (entry.id, ColumnType.rating)) {
-                              return Expanded(
-                                flex: flex,
-                                child: Padding(
-                                  padding: EdgeInsetsGeometry.directional(start: 4),
-                                  child: CustomFormField(
-                                    entryId: entry.id,
-                                    column: ColumnType.rating,
-                                    initialValue: entry.rating.toString(),
-                                    cellStyle: Theme.of(context).textTheme.bodyMedium,
-                                    textAlign: TextAlign.center,
-                                    textColor: defaultTextColor,
-                                    ref: ref,
-                                    commandManager: commandManager,
-                                  )
-                                )
-                              );
-                            }
 
-                            return Expanded(
-                              flex: flex,
+                          return Expanded(
+                            flex: flex,
+                            child: Padding(
+                              padding: EdgeInsetsGeometry.directional(start: 8),
                               child: CustomText(
                                 entryId: entry.id,
-                                column: ColumnType.rating,
+                                column: ColumnType.title,
                                 ref: ref,
-                                entryValue: entry.rating.toString(),
-                                alignment: Alignment.center,
-                                textColor: defaultTextColor,
+                                entryValue: entry.title,
+                                textColor: textColor,
+                                textLeftPadding: 5,
                               )
-                            );
-                          }
-                        ),
-
-                        Builder(
-                          builder: (context) {
-                            final flex = 2;
-                            
-                            if (editingCell == (entry.id, ColumnType.dateCompleted)) {
-                              return Expanded(
-                                flex: flex,
-                                child: Padding(
-                                  padding: EdgeInsetsGeometry.directional(start: 4),
-                                  child: CustomFormField(
-                                    entryId: entry.id,
-                                    column: ColumnType.dateCompleted,
-                                    initialValue: entry.dateCompleted!,
-                                    cellStyle: Theme.of(context).textTheme.bodyMedium,
-                                    textAlign: TextAlign.center,
-                                    textColor: defaultTextColor,
-                                    ref: ref,
-                                    commandManager: commandManager,
-                                  )
-                                )
-                              );
-                            }
-
-                            return Expanded(
-                              flex: flex,
-                              child: CustomText(
-                                entryId: entry.id,
-                                column: ColumnType.dateCompleted,
-                                ref: ref,
-                                entryValue: entry.dateCompleted!,
-                                alignment: Alignment.center,
-                                textColor: defaultTextColor,
-                              )
-                            );
-                          }
-                        ),
-
-                        Builder(
-                          builder: (context) {
-                            final flex = 4;
-                            
-                            if (editingCell == (entry.id, ColumnType.notes)) {
-                              return Expanded(
-                                flex: flex,
-                                child: Padding(
-                                  padding: EdgeInsetsGeometry.directional(start: 5, end: 15),
-                                  child: Tooltip(
-                                    constraints: BoxConstraints(maxWidth: 400),
-                                    message: entry.notes,
-                                    child: CustomFormField(
-                                      entryId: entry.id,
-                                      column: ColumnType.notes,
-                                      initialValue: entry.notes!,
-                                      cellStyle: Theme.of(context).textTheme.bodyMedium,
-                                      textColor: defaultTextColor,
-                                      ref: ref,
-                                      commandManager: commandManager,
-                                    )
-                                  )
-                                )
-                              );
-                            }
-
+                            )
+                          );
+                        }
+                      ),
+                      
+                      Builder(
+                        builder: (context) {
+                          final flex = 1;
+                          
+                          if (editingCell == (entry.id, ColumnType.rating)) {
                             return Expanded(
                               flex: flex,
                               child: Padding(
-                                padding: EdgeInsetsGeometry.directional(end: 15),
+                                padding: EdgeInsetsGeometry.directional(start: 4),
+                                child: CustomFormField(
+                                  entryId: entry.id,
+                                  column: ColumnType.rating,
+                                  initialValue: entry.rating.toString(),
+                                  cellStyle: Theme.of(context).textTheme.bodyMedium,
+                                  textAlign: TextAlign.center,
+                                  textColor: defaultTextColor,
+                                  ref: ref,
+                                  commandManager: commandManager,
+                                )
+                              )
+                            );
+                          }
+
+                          return Expanded(
+                            flex: flex,
+                            child: CustomText(
+                              entryId: entry.id,
+                              column: ColumnType.rating,
+                              ref: ref,
+                              entryValue: entry.rating.toString(),
+                              alignment: Alignment.center,
+                              textColor: defaultTextColor,
+                            )
+                          );
+                        }
+                      ),
+
+                      Builder(
+                        builder: (context) {
+                          final flex = 2;
+                          
+                          if (editingCell == (entry.id, ColumnType.dateCompleted)) {
+                            return Expanded(
+                              flex: flex,
+                              child: Padding(
+                                padding: EdgeInsetsGeometry.directional(start: 4),
+                                child: CustomFormField(
+                                  entryId: entry.id,
+                                  column: ColumnType.dateCompleted,
+                                  initialValue: entry.dateCompleted!,
+                                  cellStyle: Theme.of(context).textTheme.bodyMedium,
+                                  textAlign: TextAlign.center,
+                                  textColor: defaultTextColor,
+                                  ref: ref,
+                                  commandManager: commandManager,
+                                )
+                              )
+                            );
+                          }
+
+                          return Expanded(
+                            flex: flex,
+                            child: CustomText(
+                              entryId: entry.id,
+                              column: ColumnType.dateCompleted,
+                              ref: ref,
+                              entryValue: entry.dateCompleted!,
+                              alignment: Alignment.center,
+                              textColor: defaultTextColor,
+                            )
+                          );
+                        }
+                      ),
+
+                      Builder(
+                        builder: (context) {
+                          final flex = 4;
+                          
+                          if (editingCell == (entry.id, ColumnType.notes)) {
+                            return Expanded(
+                              flex: flex,
+                              child: Padding(
+                                padding: EdgeInsetsGeometry.directional(start: 5, end: 15),
                                 child: Tooltip(
                                   constraints: BoxConstraints(maxWidth: 400),
                                   message: entry.notes,
-                                  child: CustomText(
+                                  child: CustomFormField(
                                     entryId: entry.id,
                                     column: ColumnType.notes,
-                                    ref: ref,
-                                    entryValue: entry.notes!,
+                                    initialValue: entry.notes!,
+                                    cellStyle: Theme.of(context).textTheme.bodyMedium,
                                     textColor: defaultTextColor,
-                                    textLeftPadding: 5,
+                                    ref: ref,
+                                    commandManager: commandManager,
                                   )
                                 )
                               )
                             );
                           }
-                        ),
-                      ],
-                    )
+
+                          return Expanded(
+                            flex: flex,
+                            child: Padding(
+                              padding: EdgeInsetsGeometry.directional(end: 15),
+                              child: Tooltip(
+                                constraints: BoxConstraints(maxWidth: 400),
+                                message: entry.notes,
+                                child: CustomText(
+                                  entryId: entry.id,
+                                  column: ColumnType.notes,
+                                  ref: ref,
+                                  entryValue: entry.notes!,
+                                  textColor: defaultTextColor,
+                                  textLeftPadding: 5,
+                                )
+                              )
+                            )
+                          );
+                        }
+                      ),
+                    ],
                   );
                 },
               ),
@@ -381,26 +378,29 @@ class CustomText extends StatelessWidget {
 
   @override
   Widget build(context) {
-    return FocusableActionDetector(
-      child: InkWell(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        splashFactory: NoSplash.splashFactory,
-        onTap: () {
-          ref
-            .read(cellEditingProvider.notifier)
-            .setCell(entryId, column);
-        },
-        child: SizedBox(
-          height: 40,
-          child: Padding(
-            padding: EdgeInsetsGeometry.directional(start: textLeftPadding ?? 0),
-            child: Align(
-              alignment: alignment ?? Alignment.centerLeft,
-              child: Text(
-                entryValue,
-                key: ValueKey(entryValue),
-                style: TextStyle(
-                  color: textColor ?? Colors.black,
+    return ContextMenu(
+      id: entryId,
+      child: FocusableActionDetector(
+        child: InkWell(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          splashFactory: NoSplash.splashFactory,
+          onTap: () {
+            ref
+              .read(cellEditingProvider.notifier)
+              .setCell(entryId, column);
+          },
+          child: SizedBox(
+            height: 40,
+            child: Padding(
+              padding: EdgeInsetsGeometry.directional(start: textLeftPadding ?? 0),
+              child: Align(
+                alignment: alignment ?? Alignment.centerLeft,
+                child: Text(
+                  entryValue,
+                  key: ValueKey(entryValue),
+                  style: TextStyle(
+                    color: textColor ?? Colors.black,
+                  )
                 )
               )
             )

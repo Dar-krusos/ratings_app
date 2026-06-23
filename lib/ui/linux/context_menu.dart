@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ratings_app/providers.dart';
 
@@ -6,24 +7,10 @@ import 'package:ratings_app/providers.dart';
 enum MenuEntry {
   deleteEntry(
     'Delete row',
-    // SingleActivator(LogicalKeyboardKey.space),
   );
 
-  const MenuEntry(this.label, [this.shortcut]);
+  const MenuEntry(this.label);
   final String label;
-  final MenuSerializableShortcut? shortcut;
-
-  // deleteEntry(
-  //   'Delete row',
-  //   [
-  //     SingleActivator(LogicalKeyboardKey.space),
-  //     SingleActivator(LogicalKeyboardKey.enter),
-  //   ]
-  // );
-
-  // const MenuEntry(this.label, [this.shortcuts]);
-  // final String label;
-  // final List<MenuSerializableShortcut>? shortcuts;
 }
 
 class ContextMenu extends ConsumerStatefulWidget {
@@ -41,32 +28,8 @@ class ContextMenu extends ConsumerStatefulWidget {
 
 class _ContextMenuState extends ConsumerState<ContextMenu> {
 
-  final MenuController _menuController = MenuController();
-  ShortcutRegistryEntry? _shortcutsEntry;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    // _shortcutsEntry?.dispose();
-
-    // final Map<ShortcutActivator, Intent> shortcuts =
-    //     <ShortcutActivator, Intent>{
-    //       for (final MenuEntry item in MenuEntry.values)
-    //         if (item.shortcut != null)
-    //           item.shortcut!: VoidCallbackIntent(() => _activate(item, ref, widget.id)),
-    //         // if (item.shortcuts != null)
-    //           // for (final shortcut in item.shortcuts!)
-    //           //   shortcut: VoidCallbackIntent(() => _activate(item, ref, widget.id)),
-    //     };
-    // _shortcutsEntry = ShortcutRegistry.of(context).addAll(shortcuts);
-  }
-
-  @override
-  void dispose() {
-    _shortcutsEntry?.dispose();
-    super.dispose();
-  }
+  final _menuController = MenuController();
+  final _focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -76,11 +39,34 @@ class _ContextMenuState extends ConsumerState<ContextMenu> {
       child: MenuAnchor(
         animated: true,
         controller: _menuController,
-        menuChildren: <Widget>[
-          MenuItemButton(
-            child: Text(MenuEntry.deleteEntry.label),
-            onPressed: () => _activate(MenuEntry.deleteEntry, ref, widget.id),
-          ),
+        style: MenuStyle(
+          padding: WidgetStatePropertyAll(EdgeInsets.zero)
+        ),
+        menuChildren: [
+          Shortcuts(
+            shortcuts: {
+              const SingleActivator(
+                LogicalKeyboardKey.delete,
+              ): const DeleteIntent(),
+            },
+            child: Actions(
+              actions: {
+                DeleteIntent:
+                    CallbackAction<DeleteIntent>(
+                  onInvoke: (_) {
+                    _activate(MenuEntry.deleteEntry, ref, widget.id);
+                    return null;
+                  },
+                ),
+              },
+              child: MenuItemButton(
+                autofocus: true,
+                focusNode: _focusNode,
+                onPressed: () => _activate(MenuEntry.deleteEntry, ref, widget.id),
+                child: Text(MenuEntry.deleteEntry.label),
+              ),
+            )
+          )
         ],
         child: widget.child,
       ),
@@ -96,6 +82,7 @@ class _ContextMenuState extends ConsumerState<ContextMenu> {
 
   void _handleSecondaryTapDown(TapDownDetails details) {
     _menuController.open(position: details.localPosition);
+    _focusNode.requestFocus();
   }
 
   void _handleTapDown(TapDownDetails details) {
@@ -104,4 +91,8 @@ class _ContextMenuState extends ConsumerState<ContextMenu> {
       return;
     }
   }
+}
+
+class DeleteIntent extends Intent {
+  const DeleteIntent();
 }
