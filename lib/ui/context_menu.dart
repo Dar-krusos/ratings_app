@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:ratings_app/providers.dart';
 
 
@@ -34,8 +35,19 @@ class _ContextMenuState extends ConsumerState<ContextMenu> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: _handleTapDown,
-      onSecondaryTapDown: _handleSecondaryTapDown,
+      onTapDown: (details) {
+        if (_menuController.isOpen) {
+          _menuController.close();
+        }
+      },
+      onLongPress: () {
+        _menuController.open();
+        _focusNode.requestFocus();
+      },
+      onSecondaryTapDown: (details) {
+        _menuController.open(position: details.localPosition);
+        _focusNode.requestFocus();
+      },
       child: MenuAnchor(
         animated: true,
         controller: _menuController,
@@ -77,18 +89,6 @@ class _ContextMenuState extends ConsumerState<ContextMenu> {
     switch (selection) {
       case MenuEntry.deleteEntry:
         ref.read(entryRepositoryProvider).deleteEntry(id);
-    }
-  }
-
-  void _handleSecondaryTapDown(TapDownDetails details) {
-    _menuController.open(position: details.localPosition);
-    _focusNode.requestFocus();
-  }
-
-  void _handleTapDown(TapDownDetails details) {
-    if (_menuController.isOpen) {
-      _menuController.close();
-      return;
     }
   }
 }

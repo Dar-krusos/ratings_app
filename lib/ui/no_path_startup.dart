@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_selector/file_selector.dart';
 
@@ -21,6 +23,19 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
   final _formKey = GlobalKey<FormState>();
   final directoryController = TextEditingController();
   final fileController = TextEditingController();
+  Uint8List? fileBytes;
+
+   @override
+   void initState() {
+     super.initState();
+   }
+
+   @override
+   void dispose() {
+     directoryController.dispose();
+     fileController.dispose();
+     super.dispose();
+   }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +45,9 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
       ),
       body: Center(
         child: SizedBox(
-          width: MediaQuery.sizeOf(context).width * 0.4,
+          width: Platform.isAndroid
+          ? MediaQuery.sizeOf(context).width * 0.8
+          : MediaQuery.sizeOf(context).width * 0.4,
           child: Form(
             key: _formKey,
             child: Column(
@@ -115,6 +132,10 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
 
                         if (file != null) {
                           fileController.text = file.name;
+
+                          if (Platform.isAndroid) {
+                            fileBytes = await file.readAsBytes();
+                          }
                         }
                       }
                     )
@@ -139,7 +160,7 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
                             directoryPath = '$directoryPath/';
                           }
 
-                          ref.read(databasePathProvider.notifier).setPath('$directoryPath${fileController.text}');
+                          ref.read(databasePathProvider.notifier).setPath('$directoryPath${fileController.text}', fileBytes);
 
                           Navigator.push(
                             context,
