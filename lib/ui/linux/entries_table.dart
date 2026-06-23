@@ -397,6 +397,7 @@ class _CustomTextState extends ConsumerState<CustomText> {
 
   @override
   Widget build(context) {
+    
     return ContextMenu(
       id: widget.entryId,
       child: FocusableActionDetector(
@@ -414,7 +415,7 @@ class _CustomTextState extends ConsumerState<CustomText> {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(10)),
-              color: hovered ? Colors.grey.shade200 : Colors.transparent,
+              color: hovered ? Theme.of(context).hoverColor : Colors.transparent,
             ),
             child: Padding(
               padding: EdgeInsetsGeometry.directional(start: widget.textLeftPadding ?? 0),

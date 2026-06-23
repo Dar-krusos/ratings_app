@@ -58,7 +58,7 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
                     IconButton(
                       icon: Icon(Icons.file_open),
                       onPressed: () async {
-                        final directory = await FilePickerLinux().getDirectoryPath();
+                        final directory = await FilePicker.getDirectoryPath();
                         if (directory != null) {
                           directoryController.text = directory;
                         }
@@ -96,7 +96,7 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
                     IconButton(
                       icon: Icon(Icons.file_open),
                       onPressed: () async {
-                        final file = await FilePickerLinux().pickFiles(
+                        final file = await FilePicker.pickFiles(
                           type: FileType.custom,
                           allowedExtensions: <String>[ 'db', 'sqlite' ]
                         );
