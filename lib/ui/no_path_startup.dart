@@ -3,17 +3,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
 
 import 'package:ratings_app/providers.dart';
-import 'package:ratings_app/main.dart';
+
 class NoPathStartupScreen extends ConsumerStatefulWidget {
-  const NoPathStartupScreen({super.key});
+  final Widget Function() createMainApp;
+
+  const NoPathStartupScreen({
+    super.key,
+    required this.createMainApp,
+  });
 
   @override
-  NoPathStartupScreenState createState() {
-    return NoPathStartupScreenState();
-  }
+  NoPathStartupScreenState createState() => NoPathStartupScreenState();
 }
 
 class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
+
   final _formKey = GlobalKey<FormState>();
   final directoryController = TextEditingController();
   final fileController = TextEditingController();
@@ -133,7 +137,7 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute<void>(
-                              builder: (context) => const MainApp(),
+                              builder: (context) => widget.createMainApp(),
                             ),
                           );
 

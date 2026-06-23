@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ratings_app/ui/data_types.dart';
 import 'package:ratings_app/providers.dart';
+import 'package:ratings_app/ui/linux/providers.dart';
 import 'package:ratings_app/sort.dart';
-import 'package:ratings_app/ui/linux/entries_table.dart';
-import 'package:ratings_app/ui/linux/dialogs.dart';
 
-enum FilterType {
-  movies,
-  games,
-  books,
-}
+import 'package:ratings_app/ui/linux/entries_table.dart';
+import 'package:ratings_app/ui/dialogs.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
 
@@ -112,7 +109,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           child: Scaffold(
             body: Column(
               children: [
-                TabBar( // first row
+
+                // first row 
+
+                TabBar(
                   tabs: [
                     for (final tab in tabs)
                       Tab(
@@ -130,7 +130,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                     );
                   },
                 ),
-                Padding( // second row
+
+                // second row
+
+                Padding(
                   padding: const EdgeInsetsGeometry.directional(
                     start: 10,
                     end: 10,
@@ -148,7 +151,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                               .setSort(SortType.typeThenRating);
                           },
                         ),
-                        Expanded( // search bar
+
+                        // search bar
+                        
+                        Expanded(
                           child: Padding(
                               padding: const EdgeInsetsGeometry.directional(end: 10),
                               child: SearchBar(
@@ -167,6 +173,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                               )
                           )
                         ),
+
+                        // right-side buttons
+
                         IconButton( // undo button
                           icon: Icon(
                             Icons.undo_rounded,
@@ -215,56 +224,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         ),
       )
     );
-  }
-}
-
-class TabData {
-  final IconData icon;
-  final String title;
-
-  const TabData({
-    required this.icon,
-    required this.title,
-  });
-}
-
-const tabs = [
-
-  TabData(
-    icon: Icons.movie,
-    title: 'Movies',
-  ),
-
-  TabData(
-    icon: Icons.games,
-    title: 'Games',
-  ),
-
-  TabData(
-    icon: Icons.book,
-    title: 'Books',
-  ),
-];
-
-class TabNotifier extends Notifier<FilterType> {
-  @override
-  FilterType build() {
-    return FilterType.movies; 
-  }
-
-  void select(FilterType type) {
-    state = type;
-  }
-}
-
-class SearchNotifier extends Notifier<String> {
-  @override
-  String build() {
-    return '';
-  }
-
-  void update(String string) {
-    state = string;
   }
 }
 

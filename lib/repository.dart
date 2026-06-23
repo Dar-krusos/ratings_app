@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 
 import 'package:ratings_app/database/database.dart';
-import 'package:ratings_app/ui/linux/main_screen.dart';
+import 'package:ratings_app/ui/data_types.dart';
 import 'package:ratings_app/sort.dart';
 
 class EntryRepository {

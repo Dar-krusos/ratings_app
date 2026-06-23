@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ratings_app/providers.dart';
 import 'package:ratings_app/commands/shortcuts.dart';
-import 'package:ratings_app/ui/linux/no_path_startup.dart';
+import 'package:ratings_app/ui/no_path_startup.dart';
 
 void main() async {
 
@@ -42,7 +42,7 @@ class AppRoot extends ConsumerWidget {
 
     final path = ref.watch(databasePathProvider);
     if (path == null) {
-      return const NoPathStartupScreen();
+      return const NoPathStartupScreen(createMainApp: MainApp.new);
     } else {
       return MainApp();
     }

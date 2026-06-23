@@ -1,13 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ratings_app/database/database.dart';
 import 'package:ratings_app/database/settings_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ratings_app/repository.dart';
-import 'package:ratings_app/ui/linux/main_screen.dart';
-import 'package:ratings_app/ui/linux/columns.dart';
-import 'package:ratings_app/ui/linux/entries_table.dart';
+import 'package:ratings_app/ui/data_types.dart';
 import 'package:ratings_app/sort.dart';
 import 'package:ratings_app/commands/command.dart';
 
@@ -69,8 +66,26 @@ final sortProvider = NotifierProvider<SortNotifier, SortState>(SortNotifier.new)
 
 final searchProvider = NotifierProvider<SearchNotifier, String>(SearchNotifier.new);
 
-final cellEditingProvider = NotifierProvider<CellEditingNotifier, (int entryId, ColumnType column)?>(CellEditingNotifier.new);
-
 final commandManagerProvider = NotifierProvider<CommandManager, CommandManagerState>(CommandManager.new);
 
-final rootFocusNodeProvider = Provider<FocusNode>((ref) => throw UnimplementedError());
+class TabNotifier extends Notifier<FilterType> {
+  @override
+  FilterType build() {
+    return FilterType.movies; 
+  }
+
+  void select(FilterType type) {
+    state = type;
+  }
+}
+
+class SearchNotifier extends Notifier<String> {
+  @override
+  String build() {
+    return '';
+  }
+
+  void update(String string) {
+    state = string;
+  }
+}

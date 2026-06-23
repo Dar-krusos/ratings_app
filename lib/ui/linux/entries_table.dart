@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/src/core.dart';
 
 import 'package:ratings_app/database/database.dart';
 import 'package:ratings_app/providers.dart';
+import 'package:ratings_app/ui/linux/providers.dart';
+
 import 'package:ratings_app/ui/linux/columns.dart';
 import 'package:ratings_app/commands/command.dart';
 import 'package:ratings_app/ui/linux/context_menu.dart';
