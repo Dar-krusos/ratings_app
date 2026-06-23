@@ -4,11 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ratings_app/providers.dart';
 import 'package:ratings_app/commands/command.dart';
-import 'package:ratings_app/ui/linux/main_screen.dart';
 
 class ShortcutsManager extends ConsumerWidget {
 
-  const ShortcutsManager({super.key});
+  final Widget Function() createMainScreen;
+
+  const ShortcutsManager({
+    super.key,
+    required this.createMainScreen
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,7 +35,7 @@ class ShortcutsManager extends ConsumerWidget {
           UndoIntent: UndoAction(commandManager),
           RedoIntent: RedoAction(commandManager),
         },
-        child: MainScreen(),
+        child: createMainScreen(),
       ),
     );
   }

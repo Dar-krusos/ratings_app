@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ratings_app/providers.dart';
 import 'package:ratings_app/commands/shortcuts.dart';
 import 'package:ratings_app/ui/no_path_startup.dart';
+import 'package:ratings_app/ui/android/main_screen.dart';
 
 void main() async {
 
@@ -55,7 +56,7 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ShortcutsManager();
+    return ShortcutsManager(createMainScreen: MainScreen.new);
   }
 }
 

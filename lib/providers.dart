@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ratings_app/database/database.dart';
@@ -67,6 +68,8 @@ final sortProvider = NotifierProvider<SortNotifier, SortState>(SortNotifier.new)
 final searchProvider = NotifierProvider<SearchNotifier, String>(SearchNotifier.new);
 
 final commandManagerProvider = NotifierProvider<CommandManager, CommandManagerState>(CommandManager.new);
+
+final rootFocusNodeProvider = Provider<FocusNode>((ref) => throw UnimplementedError());
 
 class TabNotifier extends Notifier<FilterType> {
   @override

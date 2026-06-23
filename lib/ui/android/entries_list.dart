@@ -10,15 +10,15 @@ import 'package:ratings_app/ui/linux/columns.dart';
 import 'package:ratings_app/commands/command.dart';
 import 'package:ratings_app/ui/context_menu.dart';
 
-class EntriesTable extends ConsumerStatefulWidget {
+class EntriesList extends ConsumerStatefulWidget {
 
-  const EntriesTable({super.key});
+  const EntriesList({super.key});
 
   @override
-  ConsumerState<EntriesTable> createState() => _EntriesTableState();
+  ConsumerState<EntriesList> createState() => _EntriesListState();
 }
 
-class _EntriesTableState extends ConsumerState<EntriesTable> {
+class _EntriesListState extends ConsumerState<EntriesList> {
 
   final lightMovieColor = Color(0xFF016C6E);
   final lightSeriesColor = Color(0xFF8C0B2D);
