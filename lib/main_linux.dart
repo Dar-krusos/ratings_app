@@ -59,3 +59,7 @@ class MainApp extends StatelessWidget {
     return ShortcutsManager(createMainScreen: MainScreen.new);
   }
 }
+
+// add date picker to date editing
+// [Escape] to cancel editing
+// Window size management
