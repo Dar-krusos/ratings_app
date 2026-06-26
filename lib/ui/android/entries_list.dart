@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ratings_app/providers.dart';
+import 'package:ratings_app/ui/android/edit_entry_dialog.dart';
 
 class EntriesList extends ConsumerStatefulWidget {
 
@@ -55,43 +56,54 @@ class _EntriesListState extends ConsumerState<EntriesList> {
               return Card(
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: 
-                  
+                  child:
+
                   entry.notes != ''
-                  
-                  ? ExpansionTile(
-                    minTileHeight: 72,
-                    shape: RoundedRectangleBorder(),
 
-                    leading: SizedBox(
-                      width: 60,
-                      child: Text(
-                        entry.rating.toString(),
-                        style: TextStyle(
-                          fontSize: Theme.of(context).textTheme.headlineMedium?.fontSize,
-                        ),
-                        textAlign: TextAlign.center,
-                      )
+                  ? GestureDetector(
+                    onLongPress: () => showDialog<String>(
+                      context: context,
+                      builder: (BuildContext context) => EditEntryDialog(entry: entry),
                     ),
-                    title: Text(entry.title),
-                    subtitle: entry.dateCompleted != '' ? Text(entry.dateCompleted!) : null,
-                    children: [
 
-                      entry.notes != ''
+                    child: ExpansionTile(
+                      minTileHeight: 72,
+                      shape: RoundedRectangleBorder(),
 
-                      ? Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(entry.notes!),
-                      )
+                      leading: SizedBox(
+                        width: 60,
+                        child: Text(
+                          entry.rating.toString(),
+                          style: TextStyle(
+                            fontSize: Theme.of(context).textTheme.headlineMedium?.fontSize,
+                          ),
+                          textAlign: TextAlign.center,
+                        )
+                      ),
+                      title: Text(entry.title),
+                      subtitle: entry.dateCompleted != '' ? Text(entry.dateCompleted!) : null,
+                      children: [
 
-                      : const SizedBox.shrink(),
-                    ],
+                        entry.notes != ''
+
+                        ? Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(entry.notes!),
+                        )
+
+                        : const SizedBox.shrink(),
+                      ],
+                    )
                   )
 
                   : ListTile(
                     minTileHeight: 72,
                     splashColor: Theme.of(context).splashColor,
                     onTap: () {},
+                    onLongPress: () => showDialog<String>(
+                      context: context,
+                      builder: (BuildContext context) => EditEntryDialog(entry: entry),
+                    ),
 
                     leading: SizedBox(
                       width: 60,

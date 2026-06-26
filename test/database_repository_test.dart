@@ -29,7 +29,7 @@ void main() {
     final type = 'Test Type';
     final notes = 'Test notes';
 
-    await entryRepository.addEntry(title, rating, time, type, notes);
+    await entryRepository.addEntry(null, title, rating, time, type, notes);
     entries = await db.select(db.entries).get();
 
     expect(entries.length, 1);
@@ -58,7 +58,7 @@ void main() {
       notes: Value(notes),
     );
 
-    await entryRepository.updateEntry(1, entryUpdate);
+    await entryRepository.editEntry(1, entryUpdate);
     entries = await db.select(db.entries).get();
 
     expect(entries.length, 1);

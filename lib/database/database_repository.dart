@@ -124,7 +124,7 @@ class EntryRepository {
     ));
   }
 
-  Future updateEntry(int id, EntriesCompanion edit) {
+  Future editEntry(int id, EntriesCompanion edit) {
     return (db.update(db.entries)..where(
       (e) => e.id.equals(id)
     )).write(edit);

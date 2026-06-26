@@ -110,6 +110,35 @@ class AddEntryCommand implements Command {
   }
 }
 
+class EditEntryCommand implements Command {
+  final Future<void> Function(int, EntriesCompanion) setter;
+  final int id;
+  final EntriesCompanion oldValue;
+  final EntriesCompanion newValue;
+
+  EditEntryCommand({
+    required this.setter,
+    required this.id,
+    required this.oldValue,
+    required this.newValue,
+  });
+
+  @override
+  bool get isNoOp => oldValue == newValue;
+
+  @override
+  Future<void> undo() async {
+    await setter(id, oldValue);
+    debugPrint('undo: \n\treverted edit of entry with $id - current title: ${oldValue.title.value}.');
+  }
+
+  @override
+  Future<void> redo() async {
+    await setter(id, newValue);
+    debugPrint('redo: \n\tedited entry with $id - current title: ${newValue.title.value}.');
+  }
+}
+
 class EditEntryFieldCommand implements Command {
   final Future<void> Function(int, EntriesCompanion) setter;
   final int id;

@@ -61,8 +61,4 @@ class MainApp extends StatelessWidget {
 }
 
 // // android
-// top bar: https://docs.flutter.dev/cookbook/lists/floating-app-bar
-// top bar elements: tab bar (left) + buttons (right) [search, add, overflow (set path, undo, redo)]
 // search box replaces tabs when in use
-// possible item display: https://api.flutter.dev/flutter/material/ListTile-class.html
-// hold to edit

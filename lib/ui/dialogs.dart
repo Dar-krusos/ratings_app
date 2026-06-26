@@ -13,11 +13,11 @@ typedef TypeEntry = DropdownMenuEntry<TypeLabel>;
 // DropdownMenuEntry labels and values for the dropdown menu.
 
 enum TypeLabel {
-  none(''),
-  movie('Movie'),
+  none  (''),
+  movie ('Movie'),
   series('Series'),
-  game('Game'),
-  book('Book');
+  game  ('Game'),
+  book  ('Book');
 
   const TypeLabel(this.label);
   final String label;
@@ -36,9 +36,7 @@ class AddEntryDialog extends ConsumerStatefulWidget {
   const AddEntryDialog({super.key});
 
   @override
-  AddEntryDialogState createState() {
-    return AddEntryDialogState();
-  }
+  AddEntryDialogState createState() => AddEntryDialogState();
 }
 
 class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
@@ -48,6 +46,14 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
   late String selectedDate;
   late String selectedType;
   final noteController = TextEditingController();
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    ratingController.dispose();
+    noteController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +71,7 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
             spacing: 10,
             children: [
 
-              // fields
+              // title
 
               TextFormField(
                 controller: titleController,
@@ -84,6 +90,9 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
                   return null;
                 },
               ),
+
+              // rating
+
               TextFormField(
                 controller: ratingController,
                 decoration: InputDecoration(
@@ -103,20 +112,24 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
                   return null;
                 },
               ),
+
+              // date completed
+
               DatePickerForm(
                 onChanged: (date) {
                   selectedDate = date;
                 },
               ),
+
+              // media type
+
               DropdownMenuFormField(
                 width: 200,
                 initialSelection: TypeLabel.none,
                 requestFocusOnTap: true,
                 label: const Text('Media type'),
                 onSelected: (TypeLabel? type) {
-                  setState(() {
-                    selectedType = type!.label;
-                  });
+                  selectedType = type!.label;
                 },
                 dropdownMenuEntries: TypeLabel.entries,
                 validator: (value) {
@@ -126,6 +139,9 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
                   return null;
                 },
               ),
+
+              // notes
+
               TextField(
                 controller: noteController,
                 decoration: InputDecoration(
@@ -191,10 +207,13 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
 }
 
 class DatePickerForm extends StatefulWidget {
+
+  final String? initialDate;
   final void Function(String) onChanged;
 
   const DatePickerForm({
     super.key,
+    this.initialDate,
     required this.onChanged,
   });
 
@@ -205,31 +224,10 @@ class DatePickerForm extends StatefulWidget {
 class _DatePickerFormState extends State<DatePickerForm> {
   String? dateString;
 
-  Future<void> _selectDate() async {
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.fromMillisecondsSinceEpoch(0),
-      lastDate: DateTime.now(),
-      calendarDelegate: GregorianCalendarDelegate()
-    );
-
-    if (pickedDate == null) {
-      return;
-    }
-
-    dateString = 
-    '${pickedDate.year}/'
-      '${pickedDate.month.toString().length > 1
-        ? '${pickedDate.month}/'
-        : '0${pickedDate.month}/'}'
-      '${pickedDate.day.toString().length > 1
-        ? '${pickedDate.day}'
-        : '0${pickedDate.day}'}';
-
-    setState(() {
-      widget.onChanged(dateString!);
-    });
+  @override
+  void initState() {
+    super.initState();
+    dateString = widget.initialDate;
   }
 
   @override
@@ -267,6 +265,46 @@ class _DatePickerFormState extends State<DatePickerForm> {
       },
     );
   }
+
+  Future<void> _selectDate() async {
+
+    late String year = '';
+    late String month = '';
+    late String day = '';
+
+    if (dateString != null && dateString != '') {
+      year = dateString!.substring(0, 4);
+      month = dateString!.substring(5, 7);
+      day = dateString!.substring(8, 10);
+    }
+    
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: year != ''
+        ? DateTime.tryParse('$year-$month-$day')
+        : DateTime.now(),
+      firstDate: DateTime.fromMillisecondsSinceEpoch(0),
+      lastDate: DateTime.now(),
+      calendarDelegate: GregorianCalendarDelegate()
+    );
+
+    if (pickedDate == null) {
+      return;
+    }
+
+    dateString = 
+    '${pickedDate.year}/'
+      '${pickedDate.month.toString().length > 1
+        ? '${pickedDate.month}/'
+        : '0${pickedDate.month}/'}'
+      '${pickedDate.day.toString().length > 1
+        ? '${pickedDate.day}'
+        : '0${pickedDate.day}'}';
+
+    setState(() {
+      widget.onChanged(dateString!);
+    });
+  }
 }
 
 class SetPathDialog extends ConsumerStatefulWidget {
@@ -283,6 +321,13 @@ class SetPathDialogState extends ConsumerState<SetPathDialog> {
 
   late final String? currentPath;
   Uint8List? fileBytes;
+
+  @override
+  void dispose() {
+    directoryController.dispose();
+    fileController.dispose();
+    super.dispose();
+  }
 
   @override
   initState() {
@@ -395,7 +440,6 @@ class SetPathDialogState extends ConsumerState<SetPathDialog> {
 
                             if (Platform.isAndroid) {
                               fileBytes = await file.readAsBytes();
-                              debugPrint('File with bytes length: ${fileBytes!.length}');
                             }
                           }
                         }

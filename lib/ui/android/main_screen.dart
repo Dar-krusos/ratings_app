@@ -117,6 +117,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
                   Expanded(
                     child: TabBar(
+                      splashBorderRadius: BorderRadius.circular(50),
                       tabs: [
                         for (final tab in tabs)
                           Tab(

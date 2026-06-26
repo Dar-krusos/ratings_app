@@ -67,9 +67,8 @@ class _CustomFormFieldState extends ConsumerState<CustomFormField> {
 
   @override
   void dispose() {
-    super.dispose();
-
     focusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -115,7 +114,7 @@ class _CustomFormFieldState extends ConsumerState<CustomFormField> {
             textAlign: widget.textAlign ?? TextAlign.left,
             onFieldSubmitted: (value) {
               commandManager.execute(EditEntryFieldCommand(
-                setter: ref.read(entryRepositoryProvider).updateEntry,
+                setter: ref.read(entryRepositoryProvider).editEntry,
                 id: widget.entryId,
                 oldValue: companionCreator(widget.column, widget.initialValue),
                 newValue: companionCreator(widget.column, value),
@@ -159,7 +158,6 @@ class CustomText extends ConsumerStatefulWidget {
 class _CustomTextState extends ConsumerState<CustomText> {
 
   final _menuController = MenuController();
-  bool hovered = false;
 
   late final CommandManager commandManager;
   late final String entryValue;
@@ -382,7 +380,7 @@ class DateCell extends ConsumerWidget {
                     : '0${pickedDate.day}'}';
 
               commandManager.execute(EditEntryFieldCommand(
-                setter: ref.read(entryRepositoryProvider).updateEntry,
+                setter: ref.read(entryRepositoryProvider).editEntry,
                 id: entry.id,
                 oldValue: companionCreator(ColumnType.dateCompleted, entry.dateCompleted!),
                 newValue: companionCreator(ColumnType.dateCompleted, dateString),
@@ -427,7 +425,7 @@ class DateCell extends ConsumerWidget {
         break;
       case EntryMenuEntry.clearDate:
         commandManager.execute(EditEntryFieldCommand(
-          setter: ref.read(entryRepositoryProvider).updateEntry,
+          setter: ref.read(entryRepositoryProvider).editEntry,
           id: entry.id,
           oldValue: companionCreator(ColumnType.dateCompleted, entry.dateCompleted!),
           newValue: companionCreator(ColumnType.dateCompleted, ''),
