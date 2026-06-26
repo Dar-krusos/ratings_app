@@ -211,24 +211,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                           ),
                           SortButton(), // sort menu button
                           OverflowButton(), // overflow menu button
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            body: Column(
-              children: [
-
-                // first row
-
-                
-
-                // list of entries
-
-                EntriesList()
-              ],
-            ),
+            ]))])),
+            body: EntriesList()
           ),
         ),
       )

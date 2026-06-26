@@ -62,3 +62,4 @@ class MainApp extends StatelessWidget {
 
 // // android
 // search box replaces tabs when in use
+// export-copy to device location on change

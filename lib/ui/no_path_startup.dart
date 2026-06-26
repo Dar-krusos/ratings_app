@@ -162,18 +162,10 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
 
                           ref.read(databasePathProvider.notifier).setPath('$directoryPath${fileController.text}', fileBytes);
 
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute<void>(
                               builder: (context) => widget.createMainApp(),
-                            ),
-                          );
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Center(
-                                child: Text('Set database path.'),
-                              ),
                             ),
                           );
                         }
