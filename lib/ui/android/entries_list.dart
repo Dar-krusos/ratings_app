@@ -48,7 +48,6 @@ class _EntriesListState extends ConsumerState<EntriesList> {
         return Expanded(
           child: ListView.builder(
             itemCount: rows.length,
-            itemExtent: 60,
             itemBuilder:
                 (context, index) {
               final entry = rows[index];
@@ -56,7 +55,14 @@ class _EntriesListState extends ConsumerState<EntriesList> {
               return Card(
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: ListTile(
+                  child: 
+                  
+                  entry.notes != ''
+                  
+                  ? ExpansionTile(
+                    minTileHeight: 72,
+                    shape: RoundedRectangleBorder(),
+
                     leading: SizedBox(
                       width: 60,
                       child: Text(
@@ -68,6 +74,37 @@ class _EntriesListState extends ConsumerState<EntriesList> {
                       )
                     ),
                     title: Text(entry.title),
+                    subtitle: entry.dateCompleted != '' ? Text(entry.dateCompleted!) : null,
+                    children: [
+
+                      entry.notes != ''
+
+                      ? Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(entry.notes!),
+                      )
+
+                      : const SizedBox.shrink(),
+                    ],
+                  )
+
+                  : ListTile(
+                    minTileHeight: 72,
+                    splashColor: Theme.of(context).splashColor,
+                    onTap: () {},
+
+                    leading: SizedBox(
+                      width: 60,
+                      child: Text(
+                        entry.rating.toString(),
+                        style: TextStyle(
+                          fontSize: Theme.of(context).textTheme.headlineMedium?.fontSize,
+                        ),
+                        textAlign: TextAlign.center,
+                      )
+                    ),
+                    title: Text(entry.title),
+                    subtitle: entry.dateCompleted != '' ? Text(entry.dateCompleted!) : null,
                   )
                 )
               );

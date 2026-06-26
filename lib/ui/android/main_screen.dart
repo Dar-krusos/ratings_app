@@ -65,8 +65,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     }
 
     return ProviderScope(
-      // overrides: [
-      //   rootFocusNodeProvider.overrideWithValue(rootFocusNode)],
+      overrides: [
+        rootFocusNodeProvider.overrideWithValue(rootFocusNode)],
       child: Focus(
         autofocus: true,
         focusNode: rootFocusNode,

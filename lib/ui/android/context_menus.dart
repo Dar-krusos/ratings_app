@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ratings_app/providers.dart';
 import 'package:ratings_app/ui/dialogs.dart';
+import 'package:ratings_app/sort.dart';
 
 // Sort button and its menu for the main screen.
 
@@ -51,23 +52,23 @@ class _SortButtonState extends ConsumerState<SortButton> {
       ),
       menuChildren: [
         MenuItemButton(
-          onPressed: () => _activate(SortMenuEntry.title),
+          onPressed: () => _activate(SortMenuEntry.title, ref),
           child: Text(SortMenuEntry.title.label),
         ),
         MenuItemButton(
-          onPressed: () => _activate(SortMenuEntry.rating),
+          onPressed: () => _activate(SortMenuEntry.rating, ref),
           child: Text(SortMenuEntry.rating.label),
         ),
         MenuItemButton(
-          onPressed: () => _activate(SortMenuEntry.dateCompleted),
+          onPressed: () => _activate(SortMenuEntry.dateCompleted, ref),
           child: Text(SortMenuEntry.dateCompleted.label),
         ),
         MenuItemButton(
-          onPressed: () => _activate(SortMenuEntry.typeThenRating),
+          onPressed: () => _activate(SortMenuEntry.typeThenRating, ref),
           child: Text(SortMenuEntry.typeThenRating.label),
         ),
         MenuItemButton(
-          onPressed: () => _activate(SortMenuEntry.notes),
+          onPressed: () => _activate(SortMenuEntry.notes, ref),
           child: Text(SortMenuEntry.notes.label),
         ),
       ],
@@ -89,25 +90,29 @@ class _SortButtonState extends ConsumerState<SortButton> {
     );
   }
 
-  void _activate(SortMenuEntry selection) {
+  void _activate(SortMenuEntry selection, WidgetRef ref) {
+
+    late final SortType sortType;
 
     switch (selection) {
       case SortMenuEntry.title:
-        // Handle title sort
+        sortType = SortType.title;
         break;
       case SortMenuEntry.rating:
-        // Handle rating sort
+        sortType = SortType.rating;
         break;
       case SortMenuEntry.dateCompleted:
-        // Handle date completed sort
+        sortType = SortType.dateCompleted;
         break;
       case SortMenuEntry.typeThenRating:
-        // Handle type then rating sort
+        sortType = SortType.typeThenRating;
         break;
       case SortMenuEntry.notes:
-        // Handle notes sort
+        sortType = SortType.notes;
         break;
     }
+
+    ref.read(sortProvider.notifier).setSort(sortType);
   }
 }
 
