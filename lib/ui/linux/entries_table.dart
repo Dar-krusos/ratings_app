@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ratings_app/database/database.dart';
 import 'package:ratings_app/providers.dart';
-import 'package:ratings_app/ui/linux/providers.dart';
+import 'package:ratings_app/ui/linux/edit_provider.dart';
 
 import 'package:ratings_app/ui/linux/columns.dart';
 import 'package:ratings_app/commands/command.dart';
@@ -92,6 +93,9 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
 
                   return Row(
                     children: [
+
+                      // title
+
                       Builder(
                         builder: (context) {
                           final flex = 4;
@@ -147,6 +151,8 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
                           );
                         }
                       ),
+
+                      // rating
                       
                       Builder(
                         builder: (context) {
@@ -183,40 +189,81 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
                         }
                       ),
 
+                      // date completed
+
                       Builder(
                         builder: (context) {
                           final flex = 2;
-                          
-                          if (editingCell == (entry.id, ColumnType.dateCompleted)) {
-                            return Expanded(
-                              flex: flex,
-                              child: Padding(
-                                padding: EdgeInsetsGeometry.directional(start: 4),
-                                child: CustomFormField(
-                                  entryId: entry.id,
-                                  column: ColumnType.dateCompleted,
-                                  initialValue: entry.dateCompleted!,
-                                  cellStyle: Theme.of(context).textTheme.bodyMedium,
-                                  textAlign: TextAlign.center,
-                                  textColor: defaultTextColor,
-                                )
-                              )
-                            );
-                          }
+                          late String year = '';
+                          late String month = '';
+                          late String day = '';
 
+                          if (entry.dateCompleted != '') {
+                            year = entry.dateCompleted!.substring(0, 4);
+                            month = entry.dateCompleted!.substring(5, 7);
+                            day = entry.dateCompleted!.substring(8, 10);
+                          }
+                          
                           return Expanded(
                             flex: flex,
-                            child: CustomText(
-                              entryId: entry.id,
-                              column: ColumnType.dateCompleted,
-                              // ref: ref,
-                              entryValue: entry.dateCompleted!,
-                              alignment: Alignment.center,
-                              textColor: defaultTextColor,
+                            child: DateContextMenu(
+                              id: entry.id,
+                              child: TextButton(
+                                key: ValueKey(entry.dateCompleted),
+                                onPressed: () async {
+                                  final pickedDate = await showDatePicker(
+                                    context: context,
+                                    initialDate: year != ''
+                                      ? DateTime.tryParse('$year-$month-$day')
+                                      : DateTime.now(),
+                                    firstDate: DateTime.fromMillisecondsSinceEpoch(0),
+                                    lastDate: DateTime.now(),
+                                  );
+
+                                  if (pickedDate == null) {
+                                    return;
+                                  }
+
+                                  final dateString = 
+                                    '${pickedDate.year}/'
+                                      '${pickedDate.month.toString().length > 1
+                                        ? '${pickedDate.month}/'
+                                        : '0${pickedDate.month}/'}'
+                                      '${pickedDate.day.toString().length > 1
+                                        ? '${pickedDate.day}'
+                                        : '0${pickedDate.day}'}';
+
+                                  ref.watch(commandManagerProvider.notifier).execute(EditEntryFieldCommand(
+                                    setter: ref.read(entryRepositoryProvider).updateEntry,
+                                    id: entry.id,
+                                    oldValue: companionCreator(ColumnType.dateCompleted, entry.dateCompleted!),
+                                    newValue: companionCreator(ColumnType.dateCompleted, dateString),
+                                  ));
+                                  ref.read(rootFocusNodeProvider).requestFocus();
+                                  ref.watch(commandManagerProvider.notifier).refresh();
+                                },
+                                style: ButtonStyle(
+                                  overlayColor: WidgetStatePropertyAll(Theme.of(context).hoverColor),
+                                  shape: WidgetStatePropertyAll(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    )
+                                  ),
+                                  visualDensity: VisualDensity.standard
+                                ),
+                                child: Text(
+                                  entry.dateCompleted!,
+                                  style: TextStyle(
+                                    color: defaultTextColor,
+                                  )
+                                )
+                              )
                             )
                           );
                         }
                       ),
+
+                      // notes
 
                       Builder(
                         builder: (context) {
@@ -252,7 +299,6 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
                                 child: CustomText(
                                   entryId: entry.id,
                                   column: ColumnType.notes,
-                                  // ref: ref,
                                   entryValue: entry.notes!,
                                   textColor: defaultTextColor,
                                   textLeftPadding: 5,
@@ -272,6 +318,10 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
       },
     );
   }
+}
+  
+class ExitIntent extends Intent {
+  const ExitIntent();
 }
 
 class CustomFormField extends ConsumerStatefulWidget {
@@ -319,51 +369,61 @@ class _CustomFormFieldState extends ConsumerState<CustomFormField> {
 
   @override
   Widget build(context) {
-    return TextFormField(
-      key: ValueKey(widget.initialValue),
-      autofocus: true,
-      focusNode: focusNode,
-      initialValue: widget.initialValue,
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        isDense: true,
-      ),
-      maxLines: 1,
-      style: TextStyle(
-        color: widget.textColor ?? Colors.black,
-        fontSize: widget.cellStyle?.fontSize,
-        letterSpacing: widget.cellStyle?.letterSpacing,
-        height: widget.cellStyle?.height,
-        overflow: TextOverflow.ellipsis,
-      ),
-      textAlign: widget.textAlign ?? TextAlign.left,
-      onFieldSubmitted: (value) {
-        commandManager.execute(EditEntryFieldCommand(
-          setter: ref.read(entryRepositoryProvider).updateEntry,
-          id: widget.entryId,
-          oldValue: companionCreator(widget.column, widget.initialValue),
-          newValue: companionCreator(widget.column, value),
-        ));
-        ref.read(rootFocusNodeProvider).requestFocus();
-        commandManager.refresh();
+
+    return Shortcuts(
+      shortcuts: {
+        const SingleActivator(
+          LogicalKeyboardKey.escape,
+        ): const ExitIntent(),
       },
-      onTapOutside: (value) {
-        ref.read(rootFocusNodeProvider).requestFocus();
-      },
+      child: Actions(
+        actions: {
+          ExitIntent:
+              CallbackAction<ExitIntent>(
+            onInvoke: (_) {
+              exitEditing();
+              return null;
+            },
+          ),
+        },
+        child: TextFormField(
+          key: ValueKey(widget.initialValue),
+          autofocus: true,
+          focusNode: focusNode,
+          initialValue: widget.initialValue,
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            isDense: true,
+          ),
+          maxLines: 1,
+          style: TextStyle(
+            color: widget.textColor ?? Colors.black,
+            fontSize: widget.cellStyle?.fontSize,
+            letterSpacing: widget.cellStyle?.letterSpacing,
+            height: widget.cellStyle?.height,
+            overflow: TextOverflow.ellipsis,
+          ),
+          textAlign: widget.textAlign ?? TextAlign.left,
+          onFieldSubmitted: (value) {
+            commandManager.execute(EditEntryFieldCommand(
+              setter: ref.read(entryRepositoryProvider).updateEntry,
+              id: widget.entryId,
+              oldValue: companionCreator(widget.column, widget.initialValue),
+              newValue: companionCreator(widget.column, value),
+            ));
+
+            exitEditing();
+            commandManager.refresh();
+          },
+          onTapOutside: (value) { exitEditing(); },
+        )
+      )
     );
   }
 
-  EntriesCompanion companionCreator(ColumnType columnType, String value) {
-    switch (columnType) {
-      case ColumnType.title:
-        return EntriesCompanion(title: drift.Value(value));
-      case ColumnType.rating:
-        return EntriesCompanion(rating: drift.Value(int.parse(value)));
-      case ColumnType.dateCompleted:
-        return EntriesCompanion(dateCompleted: drift.Value(value));
-      case ColumnType.notes:
-        return EntriesCompanion(notes: drift.Value(value));
-    }
+  void exitEditing() {
+    ref.read(cellEditingProvider.notifier).clear();
+    ref.read(rootFocusNodeProvider).requestFocus();
   }
 }
 
@@ -415,7 +475,7 @@ class _CustomTextState extends ConsumerState<CustomText> {
           },
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderRadius: BorderRadius.circular(10),
               color: hovered ? Theme.of(context).hoverColor : Colors.transparent,
             ),
             child: Padding(
@@ -438,13 +498,15 @@ class _CustomTextState extends ConsumerState<CustomText> {
   }
 }
 
-class CellEditingNotifier extends Notifier<(int entryId, ColumnType column)?> {
-  @override
-  (int entryId, ColumnType column)? build() {
-    return null;
-  }
-
-  void setCell(int entryId, ColumnType column) {
-    state = (entryId, column);
+EntriesCompanion companionCreator(ColumnType columnType, String value) {
+  switch (columnType) {
+    case ColumnType.title:
+      return EntriesCompanion(title: drift.Value(value));
+    case ColumnType.rating:
+      return EntriesCompanion(rating: drift.Value(int.parse(value)));
+    case ColumnType.dateCompleted:
+      return EntriesCompanion(dateCompleted: drift.Value(value));
+    case ColumnType.notes:
+      return EntriesCompanion(notes: drift.Value(value));
   }
 }

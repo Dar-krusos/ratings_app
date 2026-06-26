@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_selector/file_selector.dart';
 
@@ -10,6 +10,7 @@ import 'package:ratings_app/providers.dart';
 typedef TypeEntry = DropdownMenuEntry<TypeLabel>;
 
 // DropdownMenuEntry labels and values for the dropdown menu.
+
 enum TypeLabel {
   none(''),
   movie('Movie'),

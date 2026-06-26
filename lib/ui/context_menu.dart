@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ratings_app/database/database.dart';
 import 'package:ratings_app/providers.dart';
 
 
 enum MenuEntry {
   deleteEntry(
     'Delete row',
+  ),
+  clearDate(
+    'Clear date',
   );
 
   const MenuEntry(this.label);
   final String label;
+}
+
+class DeleteIntent extends Intent {
+  const DeleteIntent();
 }
 
 class ContextMenu extends ConsumerStatefulWidget {
@@ -48,40 +57,117 @@ class _ContextMenuState extends ConsumerState<ContextMenu> {
         _menuController.open(position: details.localPosition);
         _focusNode.requestFocus();
       },
-      child: MenuAnchor(
-        animated: true,
-        controller: _menuController,
-        style: MenuStyle(
-          padding: WidgetStatePropertyAll(EdgeInsets.zero)
-        ),
-        menuChildren: [
-          Shortcuts(
-            shortcuts: {
-              const SingleActivator(
-                LogicalKeyboardKey.delete,
-              ): const DeleteIntent(),
-            },
-            child: Actions(
-              actions: {
-                DeleteIntent:
-                    CallbackAction<DeleteIntent>(
-                  onInvoke: (_) {
-                    _activate(MenuEntry.deleteEntry, ref, widget.id);
-                    return null;
-                  },
-                ),
+      child: Shortcuts(
+        shortcuts: {
+          const SingleActivator(
+            LogicalKeyboardKey.delete,
+          ): const DeleteIntent(),
+        },
+        child: Actions(
+          actions: {
+            DeleteIntent:
+                CallbackAction<DeleteIntent>(
+              onInvoke: (_) {
+                _activate(MenuEntry.deleteEntry, ref, widget.id);
+                return null;
               },
-              child: MenuItemButton(
-                autofocus: true,
-                focusNode: _focusNode,
-                onPressed: () => _activate(MenuEntry.deleteEntry, ref, widget.id),
-                child: Text(MenuEntry.deleteEntry.label),
+            ),
+          },
+          child: Focus(
+            autofocus: true,
+            focusNode: _focusNode,
+            child: MenuAnchor(
+              animated: true,
+              controller: _menuController,
+              style: MenuStyle(
+                padding: WidgetStatePropertyAll(EdgeInsets.zero)
               ),
-            )
+              menuChildren: [
+                MenuItemButton(
+                  onPressed: () => _activate(MenuEntry.deleteEntry, ref, widget.id),
+                  child: Text(MenuEntry.deleteEntry.label),
+                ),
+              ],
+              child: widget.child,
+            ),
           )
-        ],
-        child: widget.child,
-      ),
+        )
+      )
+    );
+  }
+
+  void _activate(MenuEntry selection, WidgetRef ref, int id) {
+    if (selection == MenuEntry.deleteEntry) {
+      ref.read(entryRepositoryProvider).deleteEntry(id);
+      _menuController.close();
+    } else {
+      return;
+    }
+  }
+}
+
+class DateContextMenu extends ConsumerStatefulWidget {
+  const DateContextMenu({
+    super.key,
+    required this.id,
+    required this.child});
+
+  final int id;
+  final Widget child;
+
+  @override
+  ConsumerState<DateContextMenu> createState() => _DateContextMenuState();
+}
+
+class _DateContextMenuState extends ConsumerState<DateContextMenu> {
+
+  final _menuController = MenuController();
+  final _focusNode = FocusNode();
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      autofocus: true,
+      focusNode: _focusNode,
+      child: GestureDetector(
+        onTapDown: (details) {
+          if (_menuController.isOpen) {
+            _menuController.close();
+          }
+        },
+        onLongPress: () {
+          _menuController.open();
+          _focusNode.requestFocus();
+        },
+        onSecondaryTapDown: (details) {
+          _menuController.open(position: details.localPosition);
+          _focusNode.requestFocus();
+        },
+        child: MenuAnchor(
+          animated: true,
+          controller: _menuController,
+          style: MenuStyle(
+            padding: WidgetStatePropertyAll(EdgeInsets.zero)
+          ),
+          menuChildren: [
+
+            // 'Clear date' menu item
+            
+            MenuItemButton(
+              onPressed: () => _activate(MenuEntry.clearDate, ref, widget.id),
+              child: Text(MenuEntry.clearDate.label),
+            ),
+
+            // 'Delete' menu item
+
+            MenuItemButton(
+              onPressed: () => _activate(MenuEntry.deleteEntry, ref, widget.id),
+              child: Text(MenuEntry.deleteEntry.label),
+            ),
+          ],
+          child: widget.child,
+        )
+      )
     );
   }
 
@@ -89,10 +175,9 @@ class _ContextMenuState extends ConsumerState<ContextMenu> {
     switch (selection) {
       case MenuEntry.deleteEntry:
         ref.read(entryRepositoryProvider).deleteEntry(id);
+      case MenuEntry.clearDate:
+        final updateEntry = EntriesCompanion(dateCompleted: const Value(''));
+        ref.read(entryRepositoryProvider).updateEntry(id, updateEntry);
     }
   }
-}
-
-class DeleteIntent extends Intent {
-  const DeleteIntent();
 }

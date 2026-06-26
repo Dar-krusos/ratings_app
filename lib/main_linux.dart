@@ -60,6 +60,4 @@ class MainApp extends StatelessWidget {
   }
 }
 
-// add date picker to date editing
-// [Escape] to cancel editing
 // Window size management

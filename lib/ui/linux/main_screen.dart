@@ -214,7 +214,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                     ],
                   ),
                 ),
-                Expanded( // table
+
+                // table of entries
+
+                Expanded(
                   child: EntriesTable()
                 ),
               ],
