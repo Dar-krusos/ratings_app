@@ -113,14 +113,14 @@ class EntryRepository {
     return query.watch();
   }
 
-  Future addEntry(String title, int rating, String dateCompleted, String mediaType, String notes) {
+  Future addEntry(int? id, String title, int rating, String dateCompleted, String mediaType, String notes) {
     return db.into(db.entries).insert(EntriesCompanion(
+      id: id != null ? Value(id) : const Value.absent(),
       title: Value(title),
       rating: Value(rating),
       dateCompleted: Value(dateCompleted),
       mediaType: Value(mediaType),
       notes: Value(notes)
-
     ));
   }
 

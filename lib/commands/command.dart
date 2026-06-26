@@ -2,6 +2,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ratings_app/database/database.dart';
+import 'package:ratings_app/database/database_repository.dart';
 
 abstract class Command {
   bool get isNoOp;
@@ -97,5 +98,31 @@ class EditEntryFieldCommand implements Command {
   Future<void> redo() async {
     await setter(id, newValue);
     debugPrint('redo: \n\tfrom: ${oldValue.toColumns(true)} \n\tto:   ${newValue.toColumns(true)}');
+  }
+}
+
+class DeleteEntryCommand implements Command {
+
+  final EntryRepository provider;
+  final Entry entry;
+
+  DeleteEntryCommand({
+    required this.provider,
+    required this.entry,
+  });
+
+  @override
+  bool get isNoOp => false;
+
+  @override
+  Future<void> undo() async {
+    await provider.addEntry(entry.id, entry.title, entry.rating, entry.dateCompleted!, entry.mediaType, entry.notes!);
+    debugPrint('undo: \n\tdeleted entry with ${entry.id} - ${entry.title}.');
+  }
+
+  @override
+  Future<void> redo() async {
+    await provider.deleteEntry(entry.id);
+    debugPrint('redo: \n\treverted deletion of entry with ${entry.id} - ${entry.title}.');
   }
 }

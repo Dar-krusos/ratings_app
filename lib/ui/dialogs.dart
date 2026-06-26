@@ -162,6 +162,7 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
                           );
 
                           ref.read(entryRepositoryProvider).addEntry(
+                            null,
                             titleController.text,
                             int.parse(ratingController.text),
                             selectedDate,

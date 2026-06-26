@@ -1,48 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:drift/drift.dart' as drift;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:ratings_app/database/database.dart';
 import 'package:ratings_app/providers.dart';
 import 'package:ratings_app/ui/linux/edit_provider.dart';
 
 import 'package:ratings_app/ui/linux/columns.dart';
-import 'package:ratings_app/commands/command.dart';
-import 'package:ratings_app/ui/context_menu.dart';
+import 'package:ratings_app/ui/linux/cell_builders.dart';
 
-class EntriesTable extends ConsumerStatefulWidget {
-
-  const EntriesTable({super.key});
-
-  @override
-  ConsumerState<EntriesTable> createState() => _EntriesTableState();
-}
-
-class _EntriesTableState extends ConsumerState<EntriesTable> {
+class EntriesTable extends ConsumerWidget {
 
   final lightMovieColor = Color(0xFF016C6E);
   final lightSeriesColor = Color(0xFF8C0B2D);
   final darkMovieColor = Color(0xFF6EC9CB);
   final darkSeriesColor = Color(0xFFFF6684);
 
-  late Color defaultTextColor;
-  late final String? oldValue;
+  EntriesTable({super.key});
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final entries = ref.watch(entriesProvider);
     final editingCell = ref.watch(cellEditingProvider);
+    late final Color defaultTextColor;
 
     if (MediaQuery.platformBrightnessOf(context) == Brightness.light) {
       defaultTextColor = Colors.black;
@@ -98,7 +76,6 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
 
                       Builder(
                         builder: (context) {
-                          final flex = 4;
                           Color textColor;
 
                           if (MediaQuery.platformBrightnessOf(context) == Brightness.light) {
@@ -118,35 +95,29 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
                               textColor = defaultTextColor;
                             }
                           }
-                          
-                          if (editingCell == (entry.id, ColumnType.title)) {
-                            return Expanded(
-                              flex: flex,
-                              child: Padding(
-                                padding: EdgeInsetsGeometry.directional(start: 13),
-                                child: CustomFormField(
+
+                          return Expanded(
+                            key: ValueKey(entry.title),
+                            flex: 4,
+                            child: Padding(
+                              padding: EdgeInsetsGeometry.directional(start: 8),
+                              child: 
+
+                                editingCell == (entry.id, ColumnType.title)
+
+                                ? CustomFormField(
                                   entryId: entry.id,
                                   column: ColumnType.title,
                                   initialValue: entry.title,
-                                  cellStyle: Theme.of(context).textTheme.bodyMedium,
+                                  textColor: textColor,
+                                  padding: EdgeInsets.only(left: 12)
+                                )
+
+                                : CustomText(
+                                  entry: entry,
+                                  column: ColumnType.title,
                                   textColor: textColor,
                                 )
-                              )
-                            );
-                          }
-
-                          return Expanded(
-                            flex: flex,
-                            child: Padding(
-                              padding: EdgeInsetsGeometry.directional(start: 8),
-                              child: CustomText(
-                                entryId: entry.id,
-                                column: ColumnType.title,
-                                // ref: ref,
-                                entryValue: entry.title,
-                                textColor: textColor,
-                                textLeftPadding: 5,
-                              )
                             )
                           );
                         }
@@ -156,35 +127,28 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
                       
                       Builder(
                         builder: (context) {
-                          final flex = 1;
-                          
-                          if (editingCell == (entry.id, ColumnType.rating)) {
-                            return Expanded(
-                              flex: flex,
-                              child: Padding(
-                                padding: EdgeInsetsGeometry.directional(start: 4),
-                                child: CustomFormField(
-                                  entryId: entry.id,
-                                  column: ColumnType.rating,
-                                  initialValue: entry.rating.toString(),
-                                  cellStyle: Theme.of(context).textTheme.bodyMedium,
-                                  textAlign: TextAlign.center,
-                                  textColor: defaultTextColor,
-                                )
-                              )
-                            );
-                          }
 
                           return Expanded(
-                            flex: flex,
-                            child: CustomText(
-                              entryId: entry.id,
+                            key: ValueKey(entry.rating.toString()),
+                            flex: 1,
+                            child: 
+
+                              editingCell == (entry.id, ColumnType.rating)
+
+                              ? CustomFormField(
+                                entryId: entry.id,
+                                column: ColumnType.rating,
+                                initialValue: entry.rating.toString(),
+                                textAlign: TextAlign.center,
+                                textColor: defaultTextColor,
+                              )
+
+                              : CustomText(
+                              entry: entry,
                               column: ColumnType.rating,
-                              // ref: ref,
-                              entryValue: entry.rating.toString(),
                               alignment: Alignment.center,
                               textColor: defaultTextColor,
-                            )
+                              )
                           );
                         }
                       ),
@@ -193,71 +157,12 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
 
                       Builder(
                         builder: (context) {
-                          final flex = 2;
-                          late String year = '';
-                          late String month = '';
-                          late String day = '';
 
-                          if (entry.dateCompleted != '') {
-                            year = entry.dateCompleted!.substring(0, 4);
-                            month = entry.dateCompleted!.substring(5, 7);
-                            day = entry.dateCompleted!.substring(8, 10);
-                          }
-                          
                           return Expanded(
-                            flex: flex,
-                            child: DateContextMenu(
-                              id: entry.id,
-                              child: TextButton(
-                                key: ValueKey(entry.dateCompleted),
-                                onPressed: () async {
-                                  final pickedDate = await showDatePicker(
-                                    context: context,
-                                    initialDate: year != ''
-                                      ? DateTime.tryParse('$year-$month-$day')
-                                      : DateTime.now(),
-                                    firstDate: DateTime.fromMillisecondsSinceEpoch(0),
-                                    lastDate: DateTime.now(),
-                                  );
-
-                                  if (pickedDate == null) {
-                                    return;
-                                  }
-
-                                  final dateString = 
-                                    '${pickedDate.year}/'
-                                      '${pickedDate.month.toString().length > 1
-                                        ? '${pickedDate.month}/'
-                                        : '0${pickedDate.month}/'}'
-                                      '${pickedDate.day.toString().length > 1
-                                        ? '${pickedDate.day}'
-                                        : '0${pickedDate.day}'}';
-
-                                  ref.watch(commandManagerProvider.notifier).execute(EditEntryFieldCommand(
-                                    setter: ref.read(entryRepositoryProvider).updateEntry,
-                                    id: entry.id,
-                                    oldValue: companionCreator(ColumnType.dateCompleted, entry.dateCompleted!),
-                                    newValue: companionCreator(ColumnType.dateCompleted, dateString),
-                                  ));
-                                  ref.read(rootFocusNodeProvider).requestFocus();
-                                  ref.watch(commandManagerProvider.notifier).refresh();
-                                },
-                                style: ButtonStyle(
-                                  overlayColor: WidgetStatePropertyAll(Theme.of(context).hoverColor),
-                                  shape: WidgetStatePropertyAll(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    )
-                                  ),
-                                  visualDensity: VisualDensity.standard
-                                ),
-                                child: Text(
-                                  entry.dateCompleted!,
-                                  style: TextStyle(
-                                    color: defaultTextColor,
-                                  )
-                                )
-                              )
+                            flex: 2,
+                            child: DateCell(
+                              entry: entry,
+                              textColor: defaultTextColor,
                             )
                           );
                         }
@@ -267,42 +172,31 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
 
                       Builder(
                         builder: (context) {
-                          final flex = 4;
-                          
-                          if (editingCell == (entry.id, ColumnType.notes)) {
-                            return Expanded(
-                              flex: flex,
-                              child: Padding(
-                                padding: EdgeInsetsGeometry.directional(start: 5, end: 15),
-                                child: Tooltip(
-                                  constraints: BoxConstraints(maxWidth: 400),
-                                  message: entry.notes,
-                                  child: CustomFormField(
-                                    entryId: entry.id,
-                                    column: ColumnType.notes,
-                                    initialValue: entry.notes!,
-                                    cellStyle: Theme.of(context).textTheme.bodyMedium,
-                                    textColor: defaultTextColor,
-                                  )
-                                )
-                              )
-                            );
-                          }
 
                           return Expanded(
-                            flex: flex,
+                            flex: 4,
                             child: Padding(
-                              padding: EdgeInsetsGeometry.directional(end: 15),
+                              padding: EdgeInsetsGeometry.directional(end: 14),
                               child: Tooltip(
                                 constraints: BoxConstraints(maxWidth: 400),
                                 message: entry.notes,
-                                child: CustomText(
-                                  entryId: entry.id,
-                                  column: ColumnType.notes,
-                                  entryValue: entry.notes!,
-                                  textColor: defaultTextColor,
-                                  textLeftPadding: 5,
-                                )
+                                  child:
+
+                                    editingCell == (entry.id, ColumnType.notes)
+
+                                    ? CustomFormField(
+                                      entryId: entry.id,
+                                      column: ColumnType.notes,
+                                      initialValue: entry.notes!,
+                                      textColor: defaultTextColor,
+                                      padding: EdgeInsets.only(left: 12)
+                                    )
+
+                                    : CustomText(
+                                      entry: entry,
+                                      column: ColumnType.notes,
+                                      textColor: defaultTextColor,
+                                    )
                               )
                             )
                           );
@@ -317,196 +211,5 @@ class _EntriesTableState extends ConsumerState<EntriesTable> {
         );
       },
     );
-  }
-}
-  
-class ExitIntent extends Intent {
-  const ExitIntent();
-}
-
-class CustomFormField extends ConsumerStatefulWidget {
-
-  final int entryId;
-  final ColumnType column;
-  final String initialValue;
-  final TextStyle? cellStyle;
-  final TextAlign? textAlign;
-  final Color? textColor;
-
-  const CustomFormField({
-    super.key,
-    required this.entryId,
-    required this.column,
-    required this.initialValue,
-    this.cellStyle,
-    this.textAlign,
-    this.textColor,
-  });
-
-  @override
-  ConsumerState<CustomFormField> createState() => _CustomFormFieldState();
-}
-
-class _CustomFormFieldState extends ConsumerState<CustomFormField> {
-
-  final focusNode = FocusNode();
-  late final CommandManager commandManager;
-
-  @override
-  void initState() {
-    super.initState();
-
-    focusNode.requestFocus();
-    commandManager = ref.watch(commandManagerProvider.notifier);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-
-    focusNode.dispose();
-  }
-
-  @override
-  Widget build(context) {
-
-    return Shortcuts(
-      shortcuts: {
-        const SingleActivator(
-          LogicalKeyboardKey.escape,
-        ): const ExitIntent(),
-      },
-      child: Actions(
-        actions: {
-          ExitIntent:
-              CallbackAction<ExitIntent>(
-            onInvoke: (_) {
-              exitEditing();
-              return null;
-            },
-          ),
-        },
-        child: TextFormField(
-          key: ValueKey(widget.initialValue),
-          autofocus: true,
-          focusNode: focusNode,
-          initialValue: widget.initialValue,
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            isDense: true,
-          ),
-          maxLines: 1,
-          style: TextStyle(
-            color: widget.textColor ?? Colors.black,
-            fontSize: widget.cellStyle?.fontSize,
-            letterSpacing: widget.cellStyle?.letterSpacing,
-            height: widget.cellStyle?.height,
-            overflow: TextOverflow.ellipsis,
-          ),
-          textAlign: widget.textAlign ?? TextAlign.left,
-          onFieldSubmitted: (value) {
-            commandManager.execute(EditEntryFieldCommand(
-              setter: ref.read(entryRepositoryProvider).updateEntry,
-              id: widget.entryId,
-              oldValue: companionCreator(widget.column, widget.initialValue),
-              newValue: companionCreator(widget.column, value),
-            ));
-
-            exitEditing();
-            commandManager.refresh();
-          },
-          onTapOutside: (value) { exitEditing(); },
-        )
-      )
-    );
-  }
-
-  void exitEditing() {
-    ref.read(cellEditingProvider.notifier).clear();
-    ref.read(rootFocusNodeProvider).requestFocus();
-  }
-}
-
-class CustomText extends ConsumerStatefulWidget {
-
-  final int entryId;
-  final ColumnType column;
-  final String entryValue;
-  final Alignment? alignment;
-  final Color? textColor;
-  final double? textLeftPadding;
-  final Tooltip? tooltip;
-
-  const CustomText({
-    super.key,
-    required this.entryId,
-    required this.column,
-    required this.entryValue,
-    this.alignment,
-    this.textColor,
-    this.textLeftPadding,
-    this.tooltip,
-  });
-
-  @override
-  ConsumerState<CustomText> createState() => _CustomTextState();
-}
-
-class _CustomTextState extends ConsumerState<CustomText> {
-
-  bool hovered = false;
-
-  @override
-  Widget build(context) {
-    
-    return ContextMenu(
-      id: widget.entryId,
-      child: FocusableActionDetector(
-        onShowHoverHighlight: (isHovered) {
-          setState(() {
-            hovered = isHovered;
-          });
-        },
-        child: GestureDetector(
-          onTap: () {
-            ref
-              .read(cellEditingProvider.notifier)
-              .setCell(widget.entryId, widget.column);
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: hovered ? Theme.of(context).hoverColor : Colors.transparent,
-            ),
-            child: Padding(
-              padding: EdgeInsetsGeometry.directional(start: widget.textLeftPadding ?? 0),
-              child: Align(
-                alignment: widget.alignment ?? Alignment.centerLeft,
-                child: Text(
-                  widget.entryValue,
-                  key: ValueKey(widget.entryValue),
-                  style: TextStyle(
-                    color: widget.textColor ?? Colors.black,
-                  )
-                )
-              )
-            )
-          )
-        )
-      )
-    );
-  }
-}
-
-EntriesCompanion companionCreator(ColumnType columnType, String value) {
-  switch (columnType) {
-    case ColumnType.title:
-      return EntriesCompanion(title: drift.Value(value));
-    case ColumnType.rating:
-      return EntriesCompanion(rating: drift.Value(int.parse(value)));
-    case ColumnType.dateCompleted:
-      return EntriesCompanion(dateCompleted: drift.Value(value));
-    case ColumnType.notes:
-      return EntriesCompanion(notes: drift.Value(value));
   }
 }
