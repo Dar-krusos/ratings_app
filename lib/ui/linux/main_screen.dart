@@ -203,7 +203,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                             builder: (BuildContext context) => AddEntryDialog(),
                           ),
                         ),
-                        IconButton( // settings button
+                        IconButton( // set database path button
                           icon: Icon(Icons.file_open),
                           tooltip: 'Change database path',
                           onPressed: () => showDialog<String>(

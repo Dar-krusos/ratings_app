@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ratings_app/ui/data_types.dart';
 import 'package:ratings_app/providers.dart';
-import 'package:ratings_app/sort.dart';
 
-import 'package:ratings_app/ui/android/entries_list.dart';
 import 'package:ratings_app/ui/dialogs.dart';
+import 'package:ratings_app/ui/android/entries_list.dart';
+import 'package:ratings_app/ui/android/context_menus.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
 
@@ -53,8 +53,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     
   @override
   Widget build(BuildContext context) {
-    final commandManager = ref.read(commandManagerProvider.notifier);
-    final commandManagerCheck = ref.watch(commandManagerProvider);
+    // final commandManager = ref.read(commandManagerProvider.notifier);
+    // final commandManagerCheck = ref.watch(commandManagerProvider);
 
     if (MediaQuery.platformBrightnessOf(context) == Brightness.light) {
       enabledColor = Color(0xFF454545);
@@ -208,27 +208,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                               builder: (BuildContext context) => AddEntryDialog(),
                             ),
                           ),
-                          MultiSortButton(
-                            ref: ref,
-                            icon: Icon(Icons.sort),
-                            tooltip: 'Sort by media type, then by rating',
-                            visualDensity: VisualDensity.compact,
-                            onPressed: () {
-                              ref
-                                .read(sortProvider.notifier)
-                                .setSort(SortType.typeThenRating);
-                            },
-                          ),
-                          IconButton( // menu button
-                            icon: Icon(Icons.menu),
-                            tooltip: 'Open overflow menu',
-                            visualDensity: VisualDensity.compact,
-                            onPressed: () {},
-                            // onPressed: () => showDialog<String>(
-                            //   context: context,
-                            //   builder: (BuildContext context) => OverflowMenu(),
-                            // ),
-                          ),
+                          SortButton(), // sort menu button
+                          OverflowButton(), // overflow menu button
                       ],
                     ),
                   ),
@@ -244,43 +225,12 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
                 // list of entries
 
-                Expanded( // table
-                  child: EntriesList()
-                ),
+                EntriesList()
               ],
             ),
           ),
         ),
       )
-    );
-  }
-}
-
-class MultiSortButton extends IconButton {
-  final WidgetRef ref;
-
-  const MultiSortButton({
-    super.key,
-    required this.ref,
-    required super.icon,
-    super.tooltip,
-    super.visualDensity,
-    required super.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final currentTab = ref.watch(tabProvider);
-
-    if (currentTab != FilterType.movies) {
-      return SizedBox.shrink();
-    }
-
-    return IconButton(
-      icon: super.icon,
-      tooltip: super.tooltip,
-      visualDensity: super.visualDensity,
-      onPressed: super.onPressed,
     );
   }
 }

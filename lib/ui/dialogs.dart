@@ -54,7 +54,9 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
     return AlertDialog(
       title: const Text('New entry'),
       content: SizedBox(
-        width: MediaQuery.sizeOf(context).width * 0.4,
+        width: Platform.isAndroid
+        ? MediaQuery.sizeOf(context).width * 0.8
+        : MediaQuery.sizeOf(context).width * 0.4,
         child: Form(
           key: _formKey,
           child: Column(
@@ -271,9 +273,7 @@ class SetPathDialog extends ConsumerStatefulWidget {
   const SetPathDialog({super.key});
 
   @override
-  SetPathDialogState createState() {
-    return SetPathDialogState();
-  }
+  SetPathDialogState createState() => SetPathDialogState();
 }
 
 class SetPathDialogState extends ConsumerState<SetPathDialog> {
