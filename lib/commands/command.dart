@@ -72,6 +72,44 @@ class CommandManager extends Notifier<CommandManagerState> {
   }
 }
 
+class AddEntryCommand implements Command {
+
+  final EntryRepository provider;
+  final String title;
+  final int rating;
+  final String dateCompleted;
+  final String mediaType;
+  final String notes;
+
+  int? _id;
+
+  AddEntryCommand({
+    required this.provider,
+    required this.title,
+    required this.rating,
+    required this.dateCompleted,
+    required this.mediaType,
+    required this.notes,
+  });
+
+  @override
+  bool get isNoOp => false;
+
+  @override
+  Future<void> undo() async {
+    await provider.deleteEntry(_id!);
+    debugPrint('undo: \n\treverted addition of entry with $_id - $title.');
+  }
+
+  @override
+  Future<void> redo() async {
+    int id = await provider.addEntry(_id, title, rating, dateCompleted, mediaType, notes);
+
+    _id ??= id;
+    debugPrint('redo: \n\tadded entry with $_id - $title.');
+  }
+}
+
 class EditEntryFieldCommand implements Command {
   final Future<void> Function(int, EntriesCompanion) setter;
   final int id;
@@ -117,12 +155,12 @@ class DeleteEntryCommand implements Command {
   @override
   Future<void> undo() async {
     await provider.addEntry(entry.id, entry.title, entry.rating, entry.dateCompleted!, entry.mediaType, entry.notes!);
-    debugPrint('undo: \n\tdeleted entry with ${entry.id} - ${entry.title}.');
+    debugPrint('undo: \n\treverted deletion of entry with ${entry.id} - ${entry.title}.');
   }
 
   @override
   Future<void> redo() async {
     await provider.deleteEntry(entry.id);
-    debugPrint('redo: \n\treverted deletion of entry with ${entry.id} - ${entry.title}.');
+    debugPrint('redo: \n\tdeleted entry with ${entry.id} - ${entry.title}.');
   }
 }

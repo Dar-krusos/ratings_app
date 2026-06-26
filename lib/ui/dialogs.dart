@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_selector/file_selector.dart';
 
+import 'package:ratings_app/commands/command.dart';
 import 'package:ratings_app/providers.dart';
 
 typedef TypeEntry = DropdownMenuEntry<TypeLabel>;
@@ -161,14 +162,17 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
                             ),
                           );
 
-                          ref.read(entryRepositoryProvider).addEntry(
-                            null,
-                            titleController.text,
-                            int.parse(ratingController.text),
-                            selectedDate,
-                            selectedType,
-                            noteController.text
-                          );
+                          final commandManager = ref.read(commandManagerProvider.notifier);
+
+                          commandManager.execute(AddEntryCommand(
+                            provider: ref.read(entryRepositoryProvider),
+                            title: titleController.text,
+                            rating: int.parse(ratingController.text),
+                            dateCompleted: selectedDate,
+                            mediaType: selectedType,
+                            notes: noteController.text
+                          ));
+
                           Navigator.pop(context);
                         }
                       },
