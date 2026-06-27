@@ -113,92 +113,119 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               title: Row(
                 children: [
 
-                  // tabs
+                  // tabs, search bar area and search button
 
                   Expanded(
-                    child: TabBar(
-                      splashBorderRadius: BorderRadius.circular(50),
-                      tabs: [
-                        for (final tab in tabs)
-                          Tab(
-                            icon: Icon(tab.icon),
-                            text: tab.title,
+                    child: Stack(
+                      alignment: Alignment.centerRight,
+                      children: [
+                        AnimatedOpacity(
+                          opacity: searching ? 0 : 1,
+                          curve: Curves.easeOutExpo,
+                          duration: const Duration(milliseconds: 500),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TabBar(
+                                  splashBorderRadius: BorderRadius.circular(50),
+                                  tabs: [
+                                    for (final tab in tabs)
+                                      Tab(
+                                        icon: Icon(tab.icon),
+                                        text: tab.title,
+                                      ),
+                                  ],
+                                  onTap: (index) {
+                                    Future.delayed(
+                                      const Duration(milliseconds: 150),
+                                      () {
+                                        ref.read(tabProvider.notifier)
+                                            .select(FilterType.values[index]);
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+
+                              IconButton( // search button
+                                icon: Icon(Icons.search),
+                                tooltip: 'Search',
+                                visualDensity: VisualDensity.compact,
+                                onPressed: () {
+                                  setState(() {
+                                    searching = true;
+                                  });
+                                },
+                              ),
+                            ]
+                          )
+                        ),
+
+                        TweenAnimationBuilder<double>(
+                          tween: Tween(
+                            begin: searching ? 0 : 1,
+                            end: searching ? 1 : 0,
                           ),
-                      ],
-                      onTap: (index) {
-                        Future.delayed(
-                          const Duration(milliseconds: 150),
-                          () {
-                            ref.read(tabProvider.notifier)
-                                .select(FilterType.values[index]);
+                          curve: Curves.easeOutExpo,
+                          duration: searching
+                            ? const Duration(milliseconds: 500)
+                            : const Duration(milliseconds: 1500),
+                          builder: (context, value, child) {
+                            if (value < 0.2) {
+                              return SizedBox.shrink();
+                            }
+
+                            return Align(
+                              alignment: Alignment.centerRight,
+                              child: FractionallySizedBox(
+                                widthFactor: value,
+                                child: Material(
+                                  elevation: 0,
+                                  borderRadius: BorderRadius.circular(28),
+                                  child: TextField(
+                                    controller: searchController,
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      prefixIcon: AnimatedOpacity(
+                                        duration: const Duration(milliseconds: 150),
+                                        opacity: value > 0.2 ? 1 : 0,
+                                        child: const Icon(Icons.search),
+                                      ),
+
+                                      suffixIcon: AnimatedOpacity(
+                                        duration: const Duration(milliseconds: 150),
+                                        opacity: value > 0.2 ? 1 : 0,
+                                        child: IconButton(
+                                          icon: Icon(Icons.cancel),
+                                          tooltip: 'Close search bar',
+                                          visualDensity: VisualDensity.compact,
+                                          onPressed: () {
+                                            setState(() {
+                                              searching = false;
+                                            });
+                                            searchController.text = '';
+                                            ref.read(searchProvider.notifier).update('');
+                                          },
+                                        ),
+                                      ),
+                                      hintText: 'Search',
+                                    ),
+                                  ),
+                                )
+                              ),
+                            );
                           },
-                        );
-                      },
+                        ),
+                      ],
                     ),
                   ),
 
-                  // search bar and buttons
+                  // buttons
 
                   Padding(
                     padding: const EdgeInsetsGeometry.directional(end: 5),
                     child: Row(
                       children: [
-
-                          // search bar
-                          
-                          // Expanded(
-                          //   child: Padding(
-                          //       padding: const EdgeInsetsGeometry.directional(end: 10),
-                          //       child: SearchBar(
-                          //         constraints: const BoxConstraints(minHeight: 30),
-                          //         controller: searchController,
-                          //         focusNode: searchFocusNode,
-                          //         elevation: WidgetStatePropertyAll(0),
-                          //         leading: Icon(Icons.search),
-                          //         hintText: "Search",
-                          //         onChanged: (value) {
-                          //           ref.read(searchProvider.notifier).update(value);
-                          //         },
-                          //         onTapOutside: (_) {
-                          //           rootFocusNode.requestFocus();
-                          //         }
-                          //       )
-                          //   )
-                          // ),
-
-                          // buttons
-
-                          IconButton( // search button
-                            icon: Icon(Icons.search),
-                            tooltip: 'Search',
-                            visualDensity: VisualDensity.compact,
-                            onPressed: () {
-                              setState(() {
-                                searching = true;
-                              });
-                            },
-                          ),
-
-                          // IconButton( // undo button
-                          //   icon: Icon(
-                          //     Icons.undo_rounded,
-                          //     color: commandManagerCheck.canUndo ? enabledColor : disabledColor,
-                          //   ),
-                          //   tooltip: 'Undo last change',
-                          //   onPressed: () {
-                          //     commandManager.undo();
-                          //   },
-                          // ),
-                          // IconButton( // redo button
-                          //   icon: Icon(
-                          //     Icons.redo_rounded,
-                          //     color: commandManagerCheck.canRedo ? enabledColor : disabledColor,
-                          //     ),
-                          //   tooltip: 'Redo last change',
-                          //   onPressed: () {
-                          //     commandManager.redo();
-                          //   },
-                          // ),
                           IconButton( // add entry button
                             icon: Icon(Icons.add),
                             padding: const EdgeInsetsGeometry.symmetric(horizontal: 0),
@@ -209,6 +236,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                               builder: (BuildContext context) => AddEntryDialog(),
                             ),
                           ),
+
+                          // dropdown menu buttons
+
                           SortButton(), // sort menu button
                           OverflowButton(), // overflow menu button
             ]))])),

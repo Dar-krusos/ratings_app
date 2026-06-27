@@ -59,6 +59,3 @@ class MainApp extends StatelessWidget {
     return ShortcutsManager(createMainScreen: MainScreen.new);
   }
 }
-
-// // android
-// search box replaces tabs when in use
