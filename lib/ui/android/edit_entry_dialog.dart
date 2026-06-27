@@ -71,6 +71,7 @@ class EditEntryDialogState extends ConsumerState<EditEntryDialog> {
     return AlertDialog(
       title: const Text('Edit entry'),
       content: SingleChildScrollView(
+        padding: EdgeInsets.only(top: 5),
         child: SizedBox(
           width: Platform.isAndroid
           ? MediaQuery.sizeOf(context).width * 0.8

@@ -21,9 +21,6 @@ enum SortMenuEntry {
   ),
   typeThenRating(
     'Type -> Rating',
-  ),
-  notes(
-    'Notes',
   );
 
   const SortMenuEntry(this.label);
@@ -68,10 +65,6 @@ class _SortButtonState extends ConsumerState<SortButton> {
           onPressed: () => _activate(SortMenuEntry.typeThenRating, ref),
           child: Text(SortMenuEntry.typeThenRating.label),
         ),
-        MenuItemButton(
-          onPressed: () => _activate(SortMenuEntry.notes, ref),
-          child: Text(SortMenuEntry.notes.label),
-        ),
       ],
       builder: (context, controller, child) {
         return IconButton(
@@ -107,9 +100,6 @@ class _SortButtonState extends ConsumerState<SortButton> {
         break;
       case SortMenuEntry.typeThenRating:
         sortType = SortType.typeThenRating;
-        break;
-      case SortMenuEntry.notes:
-        sortType = SortType.notes;
         break;
     }
 
@@ -158,6 +148,7 @@ class _OverflowButtonState extends ConsumerState<OverflowButton> {
       ),
       menuChildren: [
         MenuItemButton(
+          closeOnActivate: false,
           onPressed: () => _activate(OverflowMenuEntry.undo, ref),
           child: Text(
             OverflowMenuEntry.undo.label,
@@ -169,6 +160,7 @@ class _OverflowButtonState extends ConsumerState<OverflowButton> {
           )
         ),
         MenuItemButton(
+          closeOnActivate: false,
           onPressed: () => _activate(OverflowMenuEntry.redo, ref),
           child: Text(OverflowMenuEntry.redo.label,
             style: TextStyle(

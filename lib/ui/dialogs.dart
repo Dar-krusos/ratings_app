@@ -44,7 +44,7 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
   final titleController = TextEditingController();
   final ratingController = TextEditingController();
   late String selectedDate;
-  late TypeLabel selectedType;
+  late TypeLabel selectedType = TypeLabel.none;
   final noteController = TextEditingController();
 
   @override
@@ -60,6 +60,7 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
     return AlertDialog(
       title: const Text('New entry'),
       content: SingleChildScrollView(
+        padding: EdgeInsets.only(top: 5),
         child: SizedBox(
           width: Platform.isAndroid
           ? MediaQuery.sizeOf(context).width * 0.8
@@ -247,7 +248,7 @@ class _DatePickerFormState extends State<DatePickerForm> {
         children: [
 
           SizedBox(
-            width: 200,
+            width: Platform.isAndroid ? 200 : 300,
             child: TextFormField(
               controller: dateController,
               decoration: InputDecoration(
@@ -263,6 +264,7 @@ class _DatePickerFormState extends State<DatePickerForm> {
                 widget.onChanged(value);
               },
               validator: (value) {
+
                 RegExp exp = RegExp(r'(\d{4}/\d{2}/\d{2})');
 
                 if (value == null) {
@@ -300,12 +302,14 @@ class _DatePickerFormState extends State<DatePickerForm> {
     late String month = '';
     late String day = '';
 
-    if (dateController.text != '') {
+    RegExp exp = RegExp(r'(\d{4}/\d{2}/\d{2})');
+
+    if (exp.allMatches(dateController.text).isNotEmpty) {
       year = dateController.text.substring(0, 4);
       month = dateController.text.substring(5, 7);
       day = dateController.text.substring(8, 10);
     }
-    
+
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: year != ''
