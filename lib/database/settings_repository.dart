@@ -8,16 +8,30 @@ class SettingsRepository {
     this.prefs,
   );
 
-  String? get databasePath =>
+  String? get databaseFolder =>
       prefs.getString(
-        'databasePath',
+        'databaseFolder',
       );
 
-  Future<bool> setDatabasePath(
+  String? get databaseFileName =>
+      prefs.getString(
+        'databaseFileName',
+      );
+
+  Future<bool> setDatabaseFolder(
     String path,
   ) async {
     return await prefs.setString(
-      'databasePath',
+      'databaseFolder',
+      path,
+    );
+  }
+
+  Future<bool> setDatabaseFileName(
+    String path,
+  ) async {
+    return await prefs.setString(
+      'databaseFileName',
       path,
     );
   }

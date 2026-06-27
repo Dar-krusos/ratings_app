@@ -42,7 +42,7 @@ class AppRoot extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
 
     final path = ref.watch(databasePathProvider);
-    if (path == null) {
+    if (path.$1 == null || path.$2 == null) {
       return const NoPathStartupScreen(createMainApp: MainApp.new);
     } else {
       return MainApp();
@@ -62,4 +62,3 @@ class MainApp extends StatelessWidget {
 
 // // android
 // search box replaces tabs when in use
-// export-copy to device location on change

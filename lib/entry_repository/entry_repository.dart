@@ -4,7 +4,8 @@ import 'package:ratings_app/database/database.dart';
 import 'package:ratings_app/ui/data_types.dart';
 import 'package:ratings_app/sort.dart';
 
-class EntryRepository {
+abstract class EntryRepository {
+
   final AppDatabase db;
 
   EntryRepository(this.db);
@@ -16,7 +17,7 @@ class EntryRepository {
     required String searchQuery
   }) {
     final all = db.select(db.entries);
-    
+
     if (searchQuery != '') {
       all.where((e) => 
         e.title.like('%$searchQuery%') |
@@ -113,26 +114,9 @@ class EntryRepository {
     return query.watch();
   }
 
-  Future addEntry(int? id, String title, int rating, String dateCompleted, String mediaType, String notes) {
-    return db.into(db.entries).insert(EntriesCompanion(
-      id: id != null ? Value(id) : const Value.absent(),
-      title: Value(title),
-      rating: Value(rating),
-      dateCompleted: Value(dateCompleted),
-      mediaType: Value(mediaType),
-      notes: Value(notes)
-    ));
-  }
+  Future<int> addEntry(int? id, String title, int rating, String dateCompleted, String mediaType, String notes);
 
-  Future editEntry(int id, EntriesCompanion edit) {
-    return (db.update(db.entries)..where(
-      (e) => e.id.equals(id)
-    )).write(edit);
-  }
+  Future<int> editEntry(int id, EntriesCompanion edit);
 
-  Future deleteEntry(int id) {
-    return (db.delete(db.entries)..where(
-      (e) => e.id.equals(id)
-    )).go();
-  }
+  Future<int> deleteEntry(int id);
 }

@@ -20,22 +20,20 @@ class NoPathStartupScreen extends ConsumerStatefulWidget {
 
 class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
 
+  static const platform = MethodChannel('com.darkrusos.ratings_app');
   final _formKey = GlobalKey<FormState>();
   final directoryController = TextEditingController();
   final fileController = TextEditingController();
+
+  String? folderPath;
   Uint8List? fileBytes;
 
-   @override
-   void initState() {
-     super.initState();
-   }
-
-   @override
-   void dispose() {
-     directoryController.dispose();
-     fileController.dispose();
-     super.dispose();
-   }
+  @override
+  void dispose() {
+    directoryController.dispose();
+    fileController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,9 +79,19 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
                       hoverColor: Colors.transparent,
                       tooltip: 'Select the database save location',
                       onPressed: () async {
-                        final directory = await getDirectoryPath();
-                        if (directory != null) {
-                          directoryController.text = directory;
+                        if (Platform.isAndroid) {
+
+                          await pickFolder();
+
+                          if (folderPath != null) {
+                            directoryController.text = folderPath!;
+                          }
+                        } else {
+
+                          final directory = await getDirectoryPath();
+                          if (directory != null) {
+                            directoryController.text = directory;
+                          }
                         }
                       }
                     )
@@ -160,7 +168,7 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
                             directoryPath = '$directoryPath/';
                           }
 
-                          ref.read(databasePathProvider.notifier).setPath('$directoryPath${fileController.text}', fileBytes);
+                            ref.read(databasePathProvider.notifier).setPath(directoryPath, fileController.text, fileBytes);
 
                           Navigator.pushReplacement(
                             context,
@@ -179,5 +187,18 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
         )
       ),
     );
+  }
+
+  Future<void> pickFolder() async {
+    try {
+      final String? result = await platform.invokeMethod('pickFolder');
+      setState(() {
+        folderPath = result;
+      });
+    } on PlatformException catch (e) {
+      setState(() {
+        folderPath = "Error: ${e.message}";
+      });
+    }
   }
 }

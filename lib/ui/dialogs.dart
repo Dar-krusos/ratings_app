@@ -315,24 +315,35 @@ class SetPathDialog extends ConsumerStatefulWidget {
 }
 
 class SetPathDialogState extends ConsumerState<SetPathDialog> {
+
+  static const platform = MethodChannel('com.darkrusos.ratings_app');
+
   final _formKey = GlobalKey<FormState>();
   final directoryController = TextEditingController();
   final fileController = TextEditingController();
 
-  late final String? currentPath;
+  String? folderPath;
+
+
+  late final String currentPath;
   Uint8List? fileBytes;
+
+  @override
+  initState() {
+    super.initState();
+
+    late final String? currentFolder;
+    late final String? currentFileName;
+    (currentFolder, currentFileName) = ref.read(databasePathProvider);
+
+    currentPath = '$currentFolder$currentFileName';
+  }
 
   @override
   void dispose() {
     directoryController.dispose();
     fileController.dispose();
     super.dispose();
-  }
-
-  @override
-  initState() {
-    super.initState();
-    currentPath = ref.read(databasePathProvider);
   }
 
   @override
@@ -347,10 +358,12 @@ class SetPathDialogState extends ConsumerState<SetPathDialog> {
           mainAxisSize: MainAxisSize.min,
           spacing: 20,
           children: [
-            Text('Current path:\n${currentPath ?? "Not set"}'),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text('Current path:\n$currentPath'),
+            ),
 
-            if (currentPath != null)
-              Divider(),
+            Divider(),
 
             Form(
               key: _formKey,
@@ -386,9 +399,19 @@ class SetPathDialogState extends ConsumerState<SetPathDialog> {
                         hoverColor: Colors.transparent,
                         tooltip: 'Select the database save location',
                         onPressed: () async {
-                          final directory = await getDirectoryPath();
-                          if (directory != null) {
-                            directoryController.text = directory;
+                          if (Platform.isAndroid) {
+
+                            await pickFolder();
+
+                            if (folderPath != null) {
+                              directoryController.text = folderPath!;
+                            }
+                          } else {
+
+                            final directory = await getDirectoryPath();
+                            if (directory != null) {
+                              directoryController.text = directory;
+                            }
                           }
                         }
                       )
@@ -459,13 +482,13 @@ class SetPathDialogState extends ConsumerState<SetPathDialog> {
                         child: const Text('Submit'),
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            
+
                             String directoryPath = directoryController.text;
                             if (directoryPath[directoryPath.length - 1] != '/') {
                               directoryPath = '$directoryPath/';
                             }
 
-                            ref.read(databasePathProvider.notifier).setPath('$directoryPath${fileController.text}', fileBytes);
+                            ref.read(databasePathProvider.notifier).setPath(directoryPath, fileController.text, fileBytes);
 
                             Navigator.pop(context);
 
@@ -488,5 +511,18 @@ class SetPathDialogState extends ConsumerState<SetPathDialog> {
         )
       )
     );
+  }
+
+  Future<void> pickFolder() async {
+    try {
+      final String? result = await platform.invokeMethod('pickFolder');
+      setState(() {
+        folderPath = result;
+      });
+    } on PlatformException catch (e) {
+      setState(() {
+        folderPath = "Error: ${e.message}";
+      });
+    }
   }
 }

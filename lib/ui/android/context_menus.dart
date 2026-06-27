@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ratings_app/providers.dart';
-import 'package:ratings_app/ui/dialogs.dart';
 import 'package:ratings_app/sort.dart';
+
+import 'package:ratings_app/ui/dialogs.dart';
 
 // Sort button and its menu for the main screen.
 

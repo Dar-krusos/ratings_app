@@ -1,15 +1,18 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ratings_app/database/database.dart';
 import 'package:ratings_app/database/settings_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ratings_app/database/database_repository.dart';
+import 'package:ratings_app/entry_repository/entry_repository.dart';
+import 'package:ratings_app/entry_repository/standard_entry_repository.dart';
+import 'package:ratings_app/entry_repository/android_entry_repository.dart';
 import 'package:ratings_app/ui/data_types.dart';
 import 'package:ratings_app/sort.dart';
 import 'package:ratings_app/commands/command.dart';
 
-final databasePathProvider = NotifierProvider<DatabasePathNotifier, String?>(DatabasePathNotifier.new);
+final databasePathProvider = NotifierProvider<DatabasePathNotifier, (String?, String?)>(DatabasePathNotifier.new);
 
 final tabProvider = NotifierProvider<TabNotifier, FilterType>(TabNotifier.new);
 
@@ -21,12 +24,19 @@ final commandManagerProvider = NotifierProvider<CommandManager, CommandManagerSt
 
 final rootFocusNodeProvider = Provider<FocusNode>((ref) => throw UnimplementedError());
 
-
 final entryRepositoryProvider =
     Provider<EntryRepository>(
-  (ref) => EntryRepository(
-    ref.watch(databaseProvider),
-  ),
+  (ref) {
+    if (Platform.isAndroid) {
+      return AndroidEntryRepository(
+        ref.watch(databaseProvider),
+      );
+    } else {
+      return StandardEntryRepository(
+        ref.watch(databaseProvider),
+      );
+    }
+  }
 );
 
 final sharedPreferencesProvider =
@@ -45,9 +55,9 @@ final databaseProvider =
     Provider<AppDatabase>(
   (ref) {
 
-    final path = ref.watch(databasePathProvider);
+    final (dbFolder, dbFileName) = ref.watch(databasePathProvider);
 
-    final db = AppDatabase(path!);
+    final db = AppDatabase(dbFolder!, dbFileName!);
 
     ref.onDispose(() {
       db.close();

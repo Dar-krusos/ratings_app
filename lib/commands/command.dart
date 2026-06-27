@@ -1,14 +1,14 @@
-import 'package:flutter/rendering.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ratings_app/database/database.dart';
-import 'package:ratings_app/database/database_repository.dart';
+import 'package:ratings_app/entry_repository/entry_repository.dart';
 
 abstract class Command {
   bool get isNoOp;
 
-  Future<void> undo();
-  Future<void> redo();
+  Future<int> undo();
+  Future<int> redo();
 }
 
 class CommandManagerState {
@@ -47,7 +47,12 @@ class CommandManager extends Notifier<CommandManagerState> {
       return;
     }
 
-    await command.redo();
+    int id = await command.redo();
+
+    if (id == 1) {
+      return;
+    }
+
     undoStack.add(command);
     redoStack.clear();
     refresh();
@@ -56,8 +61,14 @@ class CommandManager extends Notifier<CommandManagerState> {
   Future<void> undo() async {
     if (undoStack.isEmpty) return;
 
-    final command = undoStack.removeLast();
-    await command.undo();
+    final command = undoStack.last;
+    int id = await command.undo();
+
+    if (id == 1) {
+      return;
+    }
+
+    undoStack.removeLast();
     redoStack.add(command);
     refresh();
   }
@@ -65,8 +76,14 @@ class CommandManager extends Notifier<CommandManagerState> {
   Future<void> redo() async {
     if (redoStack.isEmpty) return;
 
-    final command = redoStack.removeLast();
-    await command.redo();
+    final command = redoStack.last;
+    int id = await command.redo();
+
+    if (id == 1) {
+      return;
+    }
+
+    redoStack.removeLast();
     undoStack.add(command);
     refresh();
   }
@@ -96,22 +113,22 @@ class AddEntryCommand implements Command {
   bool get isNoOp => false;
 
   @override
-  Future<void> undo() async {
-    await provider.deleteEntry(_id!);
-    debugPrint('undo: \n\treverted addition of entry with $_id - $title.');
+  Future<int> undo() async {
+    int id = await provider.deleteEntry(_id!);
+
+    return checkResult(id, 'undo', 'reverted addition of entry with id $_id - $title.');
   }
 
   @override
-  Future<void> redo() async {
+  Future<int> redo() async {
     int id = await provider.addEntry(_id, title, rating, dateCompleted, mediaType, notes);
 
-    _id ??= id;
-    debugPrint('redo: \n\tadded entry with $_id - $title.');
+    return checkResult(id, 'redo', 'added entry with id $_id - $title.');
   }
 }
 
 class EditEntryCommand implements Command {
-  final Future<void> Function(int, EntriesCompanion) setter;
+  final Future<int> Function(int, EntriesCompanion) setter;
   final int id;
   final EntriesCompanion oldValue;
   final EntriesCompanion newValue;
@@ -127,20 +144,22 @@ class EditEntryCommand implements Command {
   bool get isNoOp => oldValue == newValue;
 
   @override
-  Future<void> undo() async {
-    await setter(id, oldValue);
-    debugPrint('undo: \n\treverted edit of entry with $id - current title: ${oldValue.title.value}.');
+  Future<int> undo() async {
+    int id = await setter(this.id, oldValue);
+
+    return checkResult(id, 'undo', 'reverted edit of entry with id $id - current title: ${oldValue.title.value}.');
   }
 
   @override
-  Future<void> redo() async {
-    await setter(id, newValue);
-    debugPrint('redo: \n\tedited entry with $id - current title: ${newValue.title.value}.');
+  Future<int> redo() async {
+    int id = await setter(this.id, newValue);
+
+    return checkResult(id, 'redo', 'edited entry with id $id - current title: ${newValue.title.value}.');
   }
 }
 
 class EditEntryFieldCommand implements Command {
-  final Future<void> Function(int, EntriesCompanion) setter;
+  final Future<int> Function(int, EntriesCompanion) setter;
   final int id;
   final EntriesCompanion oldValue;
   final EntriesCompanion newValue;
@@ -156,15 +175,16 @@ class EditEntryFieldCommand implements Command {
   bool get isNoOp => oldValue == newValue;
 
   @override
-  Future<void> undo() async {
-    await setter(id, oldValue);
-    debugPrint('undo: \n\tfrom: ${newValue.toColumns(true)} \n\tto:   ${oldValue.toColumns(true)}');
+  Future<int> undo() async {
+    int id = await setter(this.id, oldValue);
+
+    return checkResult(id, 'undo', 'entry with id ${this.id}\n\tfrom: ${newValue.toColumns(true)} \n\tto:   ${oldValue.toColumns(true)}');
   }
 
   @override
-  Future<void> redo() async {
-    await setter(id, newValue);
-    debugPrint('redo: \n\tfrom: ${oldValue.toColumns(true)} \n\tto:   ${newValue.toColumns(true)}');
+  Future<int> redo() async {
+    int id = await setter(this.id, newValue);
+    return checkResult(id, 'redo', 'entry with id ${this.id}\n\tfrom: ${oldValue.toColumns(true)} \n\tto:   ${newValue.toColumns(true)}');
   }
 }
 
@@ -182,14 +202,23 @@ class DeleteEntryCommand implements Command {
   bool get isNoOp => false;
 
   @override
-  Future<void> undo() async {
-    await provider.addEntry(entry.id, entry.title, entry.rating, entry.dateCompleted!, entry.mediaType, entry.notes!);
-    debugPrint('undo: \n\treverted deletion of entry with ${entry.id} - ${entry.title}.');
+  Future<int> undo() async {
+    int id = await provider.addEntry(entry.id, entry.title, entry.rating, entry.dateCompleted!, entry.mediaType, entry.notes!);
+    return checkResult(id, 'undo', 'reverted deletion of entry with id ${entry.id} - ${entry.title}.');
   }
 
   @override
-  Future<void> redo() async {
-    await provider.deleteEntry(entry.id);
-    debugPrint('redo: \n\tdeleted entry with ${entry.id} - ${entry.title}.');
+  Future<int> redo() async {
+    int id = await provider.deleteEntry(entry.id);
+    return checkResult(id, 'redo', 'deleted entry with id ${entry.id} - ${entry.title}.');
   }
+}
+
+int checkResult(int id, String action, String message) {
+  if (id == -1) {
+    return 1;
+  }
+
+  debugPrint('$action: \n\t$message');
+  return 0;
 }
