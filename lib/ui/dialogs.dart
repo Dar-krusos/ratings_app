@@ -256,7 +256,8 @@ class _DatePickerFormState extends State<DatePickerForm> {
                   borderSide: BorderSide(
                     width: 1.0,
                   )
-                )
+                ),
+                errorMaxLines: 2,
               ),
               onChanged: (value) {
                 widget.onChanged(value);
@@ -266,7 +267,7 @@ class _DatePickerFormState extends State<DatePickerForm> {
 
                 if (value == null) {
                   setState(() { error = true; });
-                  return 'Null value detected. Please contact support.';
+                  return 'Null value, please contact support';
                 } else if (value != '' && exp.allMatches(value).isEmpty) {
                   setState(() { error = true; });
                   return 'Please enter a valid date or leave empty';
