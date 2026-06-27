@@ -19,9 +19,6 @@ class _EntriesListState extends ConsumerState<EntriesList> {
   final darkMovieColor = Color(0xFF6EC9CB);
   final darkSeriesColor = Color(0xFFFF6684);
 
-  late Color defaultTextColor;
-  late final String? oldValue;
-
   @override
   void initState() {
     super.initState();
@@ -35,11 +32,15 @@ class _EntriesListState extends ConsumerState<EntriesList> {
   @override
   Widget build(BuildContext context) {
     final entries = ref.watch(entriesProvider);
+    late final Color movieColor;
+    late final Color seriesColor;
 
     if (MediaQuery.platformBrightnessOf(context) == Brightness.light) {
-      defaultTextColor = Colors.black;
+      movieColor = lightMovieColor;
+      seriesColor = lightSeriesColor;
     } else {
-      defaultTextColor = Colors.white;
+      movieColor = darkMovieColor;
+      seriesColor = darkSeriesColor;
     }
 
     return entries.when(
@@ -87,7 +88,12 @@ class _EntriesListState extends ConsumerState<EntriesList> {
                             textAlign: TextAlign.center,
                           )
                         ),
-                        title: Text(entry.title),
+                        title: Text(
+                          entry.title,
+                          style: TextStyle(
+                            color: entry.mediaType == 'Movie' ? movieColor : seriesColor,
+                          ),
+                        ),
                         subtitle: entry.dateCompleted != '' ? Text(entry.dateCompleted!) : null,
                         children: [
 
@@ -123,7 +129,12 @@ class _EntriesListState extends ConsumerState<EntriesList> {
                           textAlign: TextAlign.center,
                         )
                       ),
-                      title: Text(entry.title),
+                      title: Text(
+                        entry.title,
+                        style: TextStyle(
+                          color: entry.mediaType == 'Movie' ? movieColor : seriesColor,
+                        ),
+                      ),
                       subtitle: entry.dateCompleted != '' ? Text(entry.dateCompleted!) : null,
                     )
                   )

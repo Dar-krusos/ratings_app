@@ -207,9 +207,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                           tooltip: 'Close search bar',
                                           visualDensity: VisualDensity.compact,
                                           onPressed: () {
-                                            setState(() {
-                                              searching = false;
-                                            });
+
+                                            rootFocusNode.requestFocus();
+                                            setState(() { searching = false; });
                                             searchController.text = '';
                                             ref.read(searchProvider.notifier).update('');
                                           },

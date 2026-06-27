@@ -44,7 +44,7 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
   final titleController = TextEditingController();
   final ratingController = TextEditingController();
   late String selectedDate;
-  late String selectedType;
+  late TypeLabel selectedType;
   final noteController = TextEditingController();
 
   @override
@@ -59,149 +59,148 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('New entry'),
-      content: SizedBox(
-        width: Platform.isAndroid
-        ? MediaQuery.sizeOf(context).width * 0.8
-        : MediaQuery.sizeOf(context).width * 0.4,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            spacing: 10,
-            children: [
+      content: SingleChildScrollView(
+        child: SizedBox(
+          width: Platform.isAndroid
+          ? MediaQuery.sizeOf(context).width * 0.8
+          : MediaQuery.sizeOf(context).width * 0.4,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              spacing: 10,
+              children: [
 
-              // title
+                // title
 
-              TextFormField(
-                controller: titleController,
-                decoration: InputDecoration(
-                  labelText: 'Title',
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: 1.0,
+                TextFormField(
+                  controller: titleController,
+                  decoration: InputDecoration(
+                    labelText: 'Title',
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        width: 1.0,
+                      )
                     )
-                  )
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a value';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a value';
-                  }
-                  return null;
-                },
-              ),
 
-              // rating
+                // rating
 
-              TextFormField(
-                controller: ratingController,
-                decoration: InputDecoration(
-                  labelText: 'Rating',
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: 1.0,
+                TextFormField(
+                  controller: ratingController,
+                  decoration: InputDecoration(
+                    labelText: 'Rating',
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        width: 1.0,
+                      )
                     )
-                  )
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a value';
+                    } else if (int.tryParse(value) == null) {
+                      return 'Please enter a valid number';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a value';
-                  } else if (int.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  return null;
-                },
-              ),
 
-              // date completed
+                // date completed
 
-              DatePickerForm(
-                onChanged: (date) {
-                  selectedDate = date;
-                },
-              ),
+                DatePickerForm(
+                  onChanged: (date) {
+                    selectedDate = date;
+                  },
+                ),
 
-              // media type
+                // media type
 
-              DropdownMenuFormField(
-                width: 200,
-                initialSelection: TypeLabel.none,
-                requestFocusOnTap: true,
-                label: const Text('Media type'),
-                onSelected: (TypeLabel? type) {
-                  selectedType = type!.label;
-                },
-                dropdownMenuEntries: TypeLabel.entries,
-                validator: (value) {
-                  if (value == TypeLabel.none) {
-                    return 'Please select a media type';
-                  }
-                  return null;
-                },
-              ),
+                DropdownMenuFormField(
+                  width: 200,
+                  initialSelection: selectedType,
+                  requestFocusOnTap: true,
+                  label: const Text('Media type'),
+                  onSelected: (TypeLabel? type) {
+                    setState(() {
+                      selectedType = type!;
+                    });
+                  },
+                  dropdownMenuEntries: TypeLabel.entries,
+                  validator: (value) {
+                    if (value == TypeLabel.none) {
+                      return 'Please select a media type';
+                    }
+                    return null;
+                  },
+                ),
 
-              // notes
+                // notes
 
-              TextField(
-                controller: noteController,
-                decoration: InputDecoration(
-                  labelText: 'Notes',
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: 1.0,
+                TextField(
+                  controller: noteController,
+                  decoration: InputDecoration(
+                    labelText: 'Notes',
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        width: 1.0,
+                      )
                     )
-                  )
+                  ),
+                  maxLines: 3,
                 ),
-                maxLines: 3,
-              ),
-
-              // buttons
-
-              Padding(
-                padding: EdgeInsetsGeometry.directional(top: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.max,
-                  spacing: 20,
-                  children: [
-                    ElevatedButton(
-                      child: const Text('Cancel'),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    ElevatedButton(
-                      child: const Text('Submit'),
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Center(
-                                child: Text('Added new entry.'),
-                              ),
-                            ),
-                          );
-
-                          final commandManager = ref.read(commandManagerProvider.notifier);
-
-                          commandManager.execute(AddEntryCommand(
-                            provider: ref.read(entryRepositoryProvider),
-                            title: titleController.text,
-                            rating: int.parse(ratingController.text),
-                            dateCompleted: selectedDate,
-                            mediaType: selectedType,
-                            notes: noteController.text
-                          ));
-
-                          Navigator.pop(context);
-                        }
-                      },
-                    ),
-                  ]
-                )
-              )
-            ],
-          ),
+              ],
+            ),
+          )
         )
-      )
+      ),
+
+      // buttons
+
+      buttonPadding: EdgeInsets.symmetric(horizontal: 10.0),
+      actions: [
+
+        ElevatedButton(
+          child: const Text('Cancel'),
+          onPressed: () => Navigator.pop(context),
+        ),
+
+        ElevatedButton(
+          child: const Text('Submit'),
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Center(
+                    child: Text('Added new entry.'),
+                  ),
+                ),
+              );
+
+              final commandManager = ref.read(commandManagerProvider.notifier);
+
+              commandManager.execute(AddEntryCommand(
+                provider: ref.read(entryRepositoryProvider),
+                title: titleController.text,
+                rating: int.parse(ratingController.text),
+                dateCompleted: selectedDate,
+                mediaType: selectedType.label,
+                notes: noteController.text
+              ));
+
+              Navigator.pop(context);
+            }
+          },
+        ),
+      ]
     );
   }
 }
@@ -224,13 +223,12 @@ class DatePickerForm extends StatefulWidget {
 class _DatePickerFormState extends State<DatePickerForm> {
 
   final dateController = TextEditingController();
-  String? dateString;
   bool error = false;
 
   @override
   void initState() {
     super.initState();
-    dateString = widget.initialDate;
+    dateController.text = widget.initialDate ?? '';
   }
 
   @override
@@ -260,15 +258,18 @@ class _DatePickerFormState extends State<DatePickerForm> {
                   )
                 )
               ),
+              onChanged: (value) {
+                widget.onChanged(value);
+              },
               validator: (value) {
                 RegExp exp = RegExp(r'(\d{4}/\d{2}/\d{2})');
 
-                if (value == null || value.isEmpty) {
+                if (value == null) {
                   setState(() { error = true; });
-                  return 'Please enter a value';
-                } else if (exp.allMatches(value).isEmpty) {
+                  return 'Null value detected. Please contact support.';
+                } else if (value != '' && exp.allMatches(value).isEmpty) {
                   setState(() { error = true; });
-                  return 'Please enter a valid date';
+                  return 'Please enter a valid date or leave empty';
                 }
 
                 setState(() { error = false; });
@@ -298,10 +299,10 @@ class _DatePickerFormState extends State<DatePickerForm> {
     late String month = '';
     late String day = '';
 
-    if (dateString != null && dateString != '') {
-      year = dateString!.substring(0, 4);
-      month = dateString!.substring(5, 7);
-      day = dateString!.substring(8, 10);
+    if (dateController.text != '') {
+      year = dateController.text.substring(0, 4);
+      month = dateController.text.substring(5, 7);
+      day = dateController.text.substring(8, 10);
     }
     
     final pickedDate = await showDatePicker(
@@ -318,7 +319,7 @@ class _DatePickerFormState extends State<DatePickerForm> {
       return;
     }
 
-    dateString = 
+    dateController.text = 
     '${pickedDate.year}/'
       '${pickedDate.month.toString().length > 1
         ? '${pickedDate.month}/'
@@ -328,8 +329,8 @@ class _DatePickerFormState extends State<DatePickerForm> {
         : '0${pickedDate.day}'}';
 
     setState(() {
-      dateController.text = dateString!;
-      widget.onChanged(dateString!);
+      dateController.text = dateController.text;
+      widget.onChanged(dateController.text);
     });
   }
 }

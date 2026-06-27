@@ -159,11 +159,24 @@ class _OverflowButtonState extends ConsumerState<OverflowButton> {
       menuChildren: [
         MenuItemButton(
           onPressed: () => _activate(OverflowMenuEntry.undo, ref),
-          child: Text(OverflowMenuEntry.undo.label),
+          child: Text(
+            OverflowMenuEntry.undo.label,
+            style: TextStyle(
+              color: ref.watch(commandManagerProvider).canUndo
+                ? null
+                : Theme.of(context).disabledColor,
+            ),
+          )
         ),
         MenuItemButton(
           onPressed: () => _activate(OverflowMenuEntry.redo, ref),
-          child: Text(OverflowMenuEntry.redo.label),
+          child: Text(OverflowMenuEntry.redo.label,
+            style: TextStyle(
+              color: ref.watch(commandManagerProvider).canRedo
+                  ? null
+                  : Theme.of(context).disabledColor,
+            ),
+          )
         ),
         MenuItemButton(
           onPressed: () => _activate(OverflowMenuEntry.setDBPath, ref),
