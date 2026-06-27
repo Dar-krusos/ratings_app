@@ -59,3 +59,6 @@ class MainApp extends StatelessWidget {
     return ShortcutsManager(createMainScreen: MainScreen.new);
   }
 }
+
+// match splash border radius to tile
+// slider for scroll bar, by sort type?

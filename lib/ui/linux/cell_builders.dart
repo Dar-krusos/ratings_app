@@ -16,6 +16,9 @@ enum EntryMenuEntry {
   ),
   clearDate(
     'Clear date',
+  ),
+  manualInput(
+    'Manual input',
   );
 
   const EntryMenuEntry(this.label);
@@ -315,6 +318,14 @@ class DateCell extends ConsumerWidget {
       ),
       menuChildren: [
 
+        // 'Manual input' menu item
+        
+        MenuItemButton(
+          autofocus: true,
+          onPressed: () => _activate(EntryMenuEntry.manualInput, ref, entry),
+          child: Text(EntryMenuEntry.manualInput.label),
+        ),
+
         // 'Clear date' menu item
         
         MenuItemButton(
@@ -430,6 +441,11 @@ class DateCell extends ConsumerWidget {
           oldValue: companionCreator(ColumnType.dateCompleted, entry.dateCompleted!),
           newValue: companionCreator(ColumnType.dateCompleted, ''),
         ));
+        break;
+      case EntryMenuEntry.manualInput:
+        ref
+          .read(cellEditingProvider.notifier)
+          .setCell(entry.id, ColumnType.dateCompleted);
         break;
     }
 

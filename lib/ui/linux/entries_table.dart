@@ -160,10 +160,21 @@ class EntriesTable extends ConsumerWidget {
 
                           return Expanded(
                             flex: 2,
-                            child: DateCell(
-                              entry: entry,
-                              textColor: defaultTextColor,
-                            )
+                            child:
+
+                              editingCell == (entry.id, ColumnType.dateCompleted)
+
+                              ? CustomFormField(
+                                entryId: entry.id,
+                                column: ColumnType.dateCompleted,
+                                initialValue: entry.dateCompleted!,
+                                textAlign: TextAlign.center,
+                              )
+
+                              : DateCell(
+                                entry: entry,
+                                textColor: defaultTextColor,
+                              )
                           );
                         }
                       ),

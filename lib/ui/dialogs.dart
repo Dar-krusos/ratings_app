@@ -85,7 +85,7 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter some text';
+                    return 'Please enter a value';
                   }
                   return null;
                 },
@@ -105,7 +105,7 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter some text';
+                    return 'Please enter a value';
                   } else if (int.tryParse(value) == null) {
                     return 'Please enter a valid number';
                   }
@@ -222,7 +222,10 @@ class DatePickerForm extends StatefulWidget {
 }
 
 class _DatePickerFormState extends State<DatePickerForm> {
+
+  final dateController = TextEditingController();
   String? dateString;
+  bool error = false;
 
   @override
   void initState() {
@@ -231,38 +234,61 @@ class _DatePickerFormState extends State<DatePickerForm> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final errorColor = Theme.of(context).colorScheme.error;
-    final errorFontSize = Theme.of(context).textTheme.labelMedium!.fontSize;
+  void dispose() {
+    dateController.dispose();
+    super.dispose();
+  }
 
-    return FormField(
-      validator: (value) {
-        if (dateString == null) {
-          return 'Please choose a date';
-        }
-        return null;
-      },
-      builder: (field) {
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          spacing: 5,
-          children: [
-            Text('Date completed:'),
-            OutlinedButton(
-              onPressed: _selectDate,
-              child: Text(dateString ?? 'Select Date')
-            ),
-            Text(
-              field.errorText ?? '',
-              softWrap: false,
-              style: TextStyle(
-                color: errorColor,
-                fontSize: errorFontSize,
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: error ? 75 : 50,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 10,
+        children: [
+
+          SizedBox(
+            width: 200,
+            child: TextFormField(
+              controller: dateController,
+              decoration: InputDecoration(
+                labelText: 'Date completed',
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    width: 1.0,
+                  )
+                )
               ),
-            )
-          ],
-        );
-      },
+              validator: (value) {
+                RegExp exp = RegExp(r'(\d{4}/\d{2}/\d{2})');
+
+                if (value == null || value.isEmpty) {
+                  setState(() { error = true; });
+                  return 'Please enter a value';
+                } else if (exp.allMatches(value).isEmpty) {
+                  setState(() { error = true; });
+                  return 'Please enter a valid date';
+                }
+
+                setState(() { error = false; });
+                return null;
+              },
+            ),
+          ),
+
+          Padding(
+            padding: EdgeInsetsDirectional.only(bottom: error ? 20 : 0),
+            child: IconButton(
+              icon: Icon(Icons.calendar_month),
+              // hoverColor: Colors.transparent,
+              padding: EdgeInsets.zero,
+              tooltip: 'Select a date',
+              onPressed: _selectDate,
+            ),
+          ),
+        ]
+      )
     );
   }
 
@@ -302,6 +328,7 @@ class _DatePickerFormState extends State<DatePickerForm> {
         : '0${pickedDate.day}'}';
 
     setState(() {
+      dateController.text = dateString!;
       widget.onChanged(dateString!);
     });
   }
