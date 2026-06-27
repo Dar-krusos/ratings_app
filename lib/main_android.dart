@@ -15,7 +15,7 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
 
   runApp(ProviderScope(
-    overrides: [ sharedPreferencesProvider.overrideWithValue(prefs)],
+    overrides: [ sharedPreferencesProvider.overrideWithValue(prefs) ],
     child: MaterialApp(
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

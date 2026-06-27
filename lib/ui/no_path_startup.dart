@@ -87,7 +87,6 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
                             directoryController.text = folderPath!;
                           }
                         } else {
-
                           final directory = await getDirectoryPath();
                           if (directory != null) {
                             directoryController.text = directory;
@@ -129,6 +128,7 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
                     hoverColor: Colors.transparent,
                     tooltip: 'Select an existing file',
                       onPressed: () async {
+
                         final file = await openFile(
                           acceptedTypeGroups: [
                             XTypeGroup(
@@ -143,6 +143,7 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
 
                           if (Platform.isAndroid) {
                             fileBytes = await file.readAsBytes();
+                            debugPrint('File bytes length: ${fileBytes?.length}');
                           }
                         }
                       }
@@ -160,16 +161,18 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
                     ),
                     ElevatedButton(
                       child: const Text('Submit'),
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          
+
                           String directoryPath = directoryController.text;
                           if (directoryPath[directoryPath.length - 1] != '/') {
                             directoryPath = '$directoryPath/';
                           }
 
-                            ref.read(databasePathProvider.notifier).setPath(directoryPath, fileController.text, fileBytes);
+                          await ref.read(databasePathProvider.notifier).setPath(directoryPath, fileController.text, fileBytes);
 
+                          if (!context.mounted) return;
+                          
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute<void>(

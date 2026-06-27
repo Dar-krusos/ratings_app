@@ -73,12 +73,12 @@ final entriesProvider = StreamProvider<List<Entry>>((ref) {
     final searchQuery = ref.watch(searchProvider);
 
     return ref.watch(entryRepositoryProvider)
-        .watchEntries(
-          type: currentTab,
-          sortType: sort.column,
-          descending: sort.descending,
-          searchQuery: searchQuery,
-        );
+      .watchEntries(
+        type: currentTab,
+        sortType: sort.column,
+        descending: sort.descending,
+        searchQuery: searchQuery,
+      );
   },
 );
 

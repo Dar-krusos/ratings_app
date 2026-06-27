@@ -507,7 +507,7 @@ class SetPathDialogState extends ConsumerState<SetPathDialog> {
                       ),
                       ElevatedButton(
                         child: const Text('Submit'),
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
 
                             String directoryPath = directoryController.text;
@@ -515,7 +515,9 @@ class SetPathDialogState extends ConsumerState<SetPathDialog> {
                               directoryPath = '$directoryPath/';
                             }
 
-                            ref.read(databasePathProvider.notifier).setPath(directoryPath, fileController.text, fileBytes);
+                            await ref.read(databasePathProvider.notifier).setPath(directoryPath, fileController.text, fileBytes);
+
+                            if (!context.mounted) return;
 
                             Navigator.pop(context);
 
