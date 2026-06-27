@@ -155,6 +155,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                   setState(() {
                                     searching = true;
                                   });
+                                  searchFocusNode.requestFocus();
                                 },
                               ),
                             ]
@@ -183,7 +184,13 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                   elevation: 0,
                                   borderRadius: BorderRadius.circular(28),
                                   child: TextField(
+                                    focusNode: searchFocusNode,
                                     controller: searchController,
+
+                                    onChanged: (value) {
+                                      ref.read(searchProvider.notifier).update(value);
+                                    },
+
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                       prefixIcon: AnimatedOpacity(
