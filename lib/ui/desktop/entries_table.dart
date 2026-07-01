@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ratings_app/providers.dart';
-import 'package:ratings_app/ui/linux/edit_provider.dart';
+import 'package:ratings_app/ui/desktop/edit_provider.dart';
 
-import 'package:ratings_app/ui/linux/columns.dart';
-import 'package:ratings_app/ui/linux/cell_builders.dart';
+import 'package:ratings_app/ui/desktop/columns.dart';
+import 'package:ratings_app/ui/desktop/cell_builders.dart';
 
 class EntriesTable extends ConsumerWidget {
 

@@ -6,7 +6,7 @@ import 'package:ratings_app/ui/data_types.dart';
 import 'package:ratings_app/providers.dart';
 import 'package:ratings_app/sort.dart';
 
-import 'package:ratings_app/ui/linux/entries_table.dart';
+import 'package:ratings_app/ui/desktop/entries_table.dart';
 import 'package:ratings_app/ui/dialogs.dart';
 
 class MainScreen extends ConsumerStatefulWidget {

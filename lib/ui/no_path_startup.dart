@@ -150,39 +150,31 @@ class NoPathStartupScreenState extends ConsumerState<NoPathStartupScreen> {
                     )
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  spacing: 20,
-                  children: [
-                    ElevatedButton(
-                      child: const Text('Cancel'),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    ElevatedButton(
-                      child: const Text('Submit'),
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
+                Align(
+                  alignment: Alignment.center,
+                  child: ElevatedButton(
+                    child: const Text('Confirm'),
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
 
-                          String directoryPath = directoryController.text;
-                          if (directoryPath[directoryPath.length - 1] != '/') {
-                            directoryPath = '$directoryPath/';
-                          }
-
-                          await ref.read(databasePathProvider.notifier).setPath(directoryPath, fileController.text, fileBytes);
-
-                          if (!context.mounted) return;
-                          
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute<void>(
-                              builder: (context) => widget.createMainApp(),
-                            ),
-                          );
+                        String directoryPath = directoryController.text;
+                        if (directoryPath[directoryPath.length - 1] != '/') {
+                          directoryPath = '$directoryPath/';
                         }
-                      },
-                    ),
-                  ]
+
+                        await ref.read(databasePathProvider.notifier).setPath(directoryPath, fileController.text, fileBytes);
+
+                        if (!context.mounted) return;
+                        
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (context) => widget.createMainApp(),
+                          ),
+                        );
+                      }
+                    },
+                  ),
                 )
               ],
             )

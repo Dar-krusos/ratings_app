@@ -175,7 +175,7 @@ class AddEntryDialogState extends ConsumerState<AddEntryDialog> {
         ),
 
         ElevatedButton(
-          child: const Text('Submit'),
+          child: const Text('Confirm'),
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               ScaffoldMessenger.of(context).showSnackBar(

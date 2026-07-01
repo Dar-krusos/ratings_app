@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:ratings_app/ui/linux/columns.dart';
+import 'package:ratings_app/ui/desktop/columns.dart';
 
 class CellEditingNotifier extends Notifier<(int entryId, ColumnType column)?> {
   @override
