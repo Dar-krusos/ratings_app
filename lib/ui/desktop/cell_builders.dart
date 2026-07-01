@@ -244,6 +244,7 @@ class _CustomTextState extends ConsumerState<CustomText> {
 
                 style: ButtonStyle(
                   alignment: widget.alignment ?? Alignment.centerLeft,
+                  splashFactory: NoSplash.splashFactory,
                   shape: WidgetStatePropertyAll(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -356,9 +357,6 @@ class DateCell extends ConsumerWidget {
         }
 
         return GestureDetector(
-          onLongPress: () {
-            controller.open();
-          },
           onSecondaryTapDown: (details) {
             controller.open(position: details.localPosition);
           },
@@ -402,13 +400,12 @@ class DateCell extends ConsumerWidget {
             },
 
             style: ButtonStyle(
-              overlayColor: WidgetStatePropertyAll(Theme.of(context).hoverColor),
+              splashFactory: NoSplash.splashFactory,
               shape: WidgetStatePropertyAll(
                 RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 )
               ),
-              visualDensity: VisualDensity.standard
             ),
 
             child: Text(
